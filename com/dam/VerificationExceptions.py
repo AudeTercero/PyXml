@@ -22,6 +22,7 @@ def dniFormat(dni):
         raise MisExceptions('No se cumple con el formato. Debe tener 8 digitos y una letra.')
 
 
+
 def matFormat(matricula):
     if len(matricula) != 7:
         raise MisExceptions('Debe tener 7 caractres')
