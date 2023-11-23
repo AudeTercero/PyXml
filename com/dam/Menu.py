@@ -1,5 +1,7 @@
 import GestionVehiculos
 import GestionAlquiler
+import GestionXML
+GestionXML.eliminarEspacios('alquileres.xml')
 print("=================================")
 salir = True
 gesVehi = GestionVehiculos

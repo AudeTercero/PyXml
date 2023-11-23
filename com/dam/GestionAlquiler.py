@@ -1,5 +1,5 @@
 import VerificationExceptions
-
+import GestionXML
 
 def iniAlquiler():
     dni = None
@@ -7,7 +7,8 @@ def iniAlquiler():
     fechaFin = None
     kmIni = None
     intentos = 0
-    while (intentos < 3):
+    salir = False
+    while (intentos < 3 and salir is False):
         try:
             if (dni is None):
                 aux = input('Introduce el dni del cliente:\n')
@@ -30,17 +31,14 @@ def iniAlquiler():
                 kmIni = aux
                 intentos = 0
                 estado = 'Activo'
+                salir = True
         except VerificationExceptions.MisExceptions as err:
             intentos += 1
             print(err)
-           # if (fechaIni is None):
-           #     dni = None
-           # elif (fechaIni is not None and fechaFin is None):
-           #     fechaIni = None
-           # elif (fechaFin is not None and kmIni is None):
-           #     fechaFin = None
-           # elif (kmIni is not None):
-           #     kmIni = None
+    if(intentos < 3):
+        GestionXML.crearAlquiler(dni,fechaIni,fechaFin,kmIni,estado)
+    else:
+        print("Se han superado el maximo de errores.")
 
 
 def finAlquiler():

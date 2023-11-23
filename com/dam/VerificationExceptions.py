@@ -33,7 +33,9 @@ def matFormat(matricula):
 
 
 def esNum(num):
-    if type(num) != int:
+    try:
+        int(num)
+    except Exception:
         raise MisExceptions('Debe introducir solo numeros')
 
 
