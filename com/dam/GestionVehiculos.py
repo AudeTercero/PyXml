@@ -1,16 +1,10 @@
 import GestionXML
 
 
-def prettify(elem):
-    from xml.etree import ElementTree
-    from xml.dom import minidom
-
-    rough_string = ElementTree.tostring(elem, 'utf-8')
-    reparsed = minidom.parseString(rough_string)
-    return reparsed.toprettyxml(indent="  ")
-
-
 def alta():
+    xmlPath = "vehiculos.xml"
+    lista = GestionXML.leerVehiculos(xmlPath)
+
     # Comprobaciones pertinentes
 
     matricula = input("Ingrese la matrícula del vehículo: ")
@@ -23,10 +17,11 @@ def alta():
     # Comprobar si ya existe el vehiculo
 
     # Si no existe, aniadir vehiculo
-    GestionXML.aniadirVehiculo(matricula, marca, modelo, anioFabricacion, tarifaDia, estado)
+    GestionXML.aniadirVehiculo(matricula, marca, modelo, anioFabricacion, tarifaDia, estado, xmlPath)
 
 
 def baja():
+    xmlPath = "vehiculos.xml"
     # Comprobaciones pertinentes
     matricula = input("Ingrese la matrícula del vehículo: ")
 
@@ -34,18 +29,19 @@ def baja():
 
     # Preguntar si desea borrarlo
 
-    GestionXML.eliminarVehiculo(matricula)
+    GestionXML.eliminarVehiculo(matricula, xmlPath)
 
 
 def modificar():
     salir = True
-    xmlPath = "Ruta fichero xml vehiculos" #No se cual
+    nuevaMatricula, nuevaMarca, nuevoModelo, nuevoAnio, nuevaTarifa, nuevoEstado = ""
+    xmlPath = "vehiculos.xml"
 
     # Comprobaciones pertinentes
     matricula = input("Ingrese la matrícula del vehículo: ")
 
     # Comprobar que el vehiculo existe
-    GestionXML.leerVehiculos(xmlPath)
+    lista = GestionXML.leerVehiculos(xmlPath)
 
     #Si existe recogemos sus atributos
 
@@ -74,14 +70,49 @@ def modificar():
         else:
             print("Esa opcion no existe")
 
+    #Si desea guardar
+    GestionXML.eliminarVehiculo(matricula)
+    GestionXML.aniadirVehiculo(nuevaMatricula, nuevaMarca, nuevoModelo, nuevoAnio, nuevaTarifa, nuevoEstado)
+
 
 def buscar():
-    print()
+    xmlPath = "vehiculos.xml"
+
+    # Comprobaciones pertinentes
+    matricula = input("Ingrese la matrícula del vehículo: ")
+
+    #Comprobamos que existe el vehiculo
+    lista = GestionXML.leerVehiculos(xmlPath)
+
+    #Si existe lo mostramos
+    if lista:
+        for vehiculoInfo in lista:
+            if vehiculoInfo[1] == matricula:
+                print("=== VECHICULO ===")
+                print("ID:", vehiculoInfo[0])
+                print("Matrícula:", vehiculoInfo[1])
+                print("Marca y Modelo:", vehiculoInfo[2])
+                print("Año de Fabricación:", vehiculoInfo[3])
+                print("Tarifa por Día:", vehiculoInfo[4])
+                print("Estado:", vehiculoInfo[5])
 
 
 def mostrar():
-    print()
+    xmlPath = "vehiculos.xml"
+    lista = GestionXML.leerVehiculos(xmlPath)
 
+    if lista:
+        for vehiculoInfo in lista:
+            print("=== VECHICULO ===")
+            print("ID:", vehiculoInfo[0])
+            print("Matrícula:", vehiculoInfo[1])
+            print("Marca y Modelo:", vehiculoInfo[2])
+            print("Año de Fabricación:", vehiculoInfo[3])
+            print("Tarifa por Día:", vehiculoInfo[4])
+            print("Estado:", vehiculoInfo[5])
+            print("=" * 17)
+    else:
+        print("No hay vehiculos guardados")
 
 def menu():
     salir = True
