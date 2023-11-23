@@ -10,29 +10,37 @@ def iniAlquiler():
     while (intentos < 3):
         try:
             if (dni is None):
-                dni = input('Introduce el dni del cliente:\n')
-                VerificationExceptions.dniFormat(dni)
+                aux = input('Introduce el dni del cliente:\n')
+                VerificationExceptions.dniFormat(aux)
+                dni = aux
+                intentos = 0
             if (fechaIni is None):
-                fechaIni = input('Introduce la fecha de inicio del alquiler(yyyy-mm-dd):\n')
-                VerificationExceptions.formatoFecha(fechaIni)
+                aux = input('Introduce la fecha de inicio del alquiler(yyyy-mm-dd):\n')
+                VerificationExceptions.formatoFecha(aux)
+                fechaIni = aux
+                intentos = 0
             if (fechaFin is None):
-                fechaFin = input('Introduce la fecha final del alquiler(yyyy-mm-dd):\n')
-                VerificationExceptions.formatoFecha(fechaFin)
+                aux = input('Introduce la fecha final del alquiler(yyyy-mm-dd):\n')
+                VerificationExceptions.formatoFecha(aux)
+                fechaFin = aux
+                intentos = 0
             if (kmIni is None):
-                kmIni = input('Introduce los kilometros iniciales:\n')
-                VerificationExceptions.esNum(kmIni)
+                aux = input('Introduce los kilometros iniciales:\n')
+                VerificationExceptions.esNum(aux)
+                kmIni = aux
+                intentos = 0
                 estado = 'Activo'
         except VerificationExceptions.MisExceptions as err:
             intentos += 1
             print(err)
-            if (fechaIni is None and fechaFin is None and kmIni is None):
-                dni = None
-            elif (dni is not None and fechaIni is not None and fechaFin is None):
-                fechaIni = None
-            elif (fechaFin is not None and kmIni is None):
-                fechaFin = None
-            elif (kmIni is not None):
-                kmIni = None
+           # if (fechaIni is None):
+           #     dni = None
+           # elif (fechaIni is not None and fechaFin is None):
+           #     fechaIni = None
+           # elif (fechaFin is not None and kmIni is None):
+           #     fechaFin = None
+           # elif (kmIni is not None):
+           #     kmIni = None
 
 
 def finAlquiler():
