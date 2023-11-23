@@ -27,14 +27,12 @@ def iniAlquiler():
             print(err)
             if (fechaIni is None and fechaFin is None and kmIni is None):
                 dni = None
-            elif(dni is not None and fechaIni is not None and fechaFin is None):
+            elif (dni is not None and fechaIni is not None and fechaFin is None):
                 fechaIni = None
-            elif(fechaFin is not None and kmIni is None):
+            elif (fechaFin is not None and kmIni is None):
                 fechaFin = None
-            elif(kmIni is not None):
+            elif (kmIni is not None):
                 kmIni = None
-
-
 
 
 def finAlquiler():
@@ -46,6 +44,15 @@ def finAlquiler():
 
 
 def modificar():
+    lista = {}
+
+    # aqui se puede meter opciones de switch para luego hacer cosas segun las opciones que metamos
+    # se podria usar una lista para asi tener los vehiculos con un menu independiente al numero de vehiculos mostrados para luego mostrarlos
+    switch_dic = {
+        'opc1': buscarDni(),
+    }
+    #hay que probarlo
+    resulado = switch_dic.get(lista,'opc1')
     print()
 
 
