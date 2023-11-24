@@ -1,15 +1,7 @@
 import xml.etree.ElementTree as ET
 from xml.etree.ElementTree import Element, SubElement, Comment, ElementTree
 from pathlib import Path
-
-
-def prettify(elem):
-    from xml.etree import ElementTree
-    from xml.dom import minidom
-
-    rough_string = ElementTree.tostring(elem, 'utf-8')
-    reparsed = minidom.parseString(rough_string)
-    return reparsed.toprettyxml(indent="  ")
+from datetime import datetime
 
 
 def leerVehiculos(xmlPath):
@@ -59,10 +51,6 @@ def recorrer(elemento, indent=0):
         recorrer(n)
 
 
-def leerAlquileres():
-    print()
-
-
 def aniadirVehiculo(matricula, marca, modelo, anioFabricacion, tarifaDia, estado, xmlPath):  # Mirar tema ID
 
     try:
@@ -96,10 +84,6 @@ def aniadirVehiculo(matricula, marca, modelo, anioFabricacion, tarifaDia, estado
     file.close()
 
 
-def aniadirAlquiler():
-    print()
-
-
 def eliminarVehiculo(matricula, xmlPath):
     try:
         tree = ET.parse(xmlPath)
@@ -127,11 +111,8 @@ def eliminarVehiculo(matricula, xmlPath):
         print(f"Error: {e}")
 
 
-def eliminarAlquiler():
-    print()
-
-
-def crearAlquiler(dni, fechaIni, fechaFin, kmIni, estado):
+# ******************** FUNCIONES  ALQUILER **************************************
+def crearAlquiler(dni, fechaIni, fechaFin, kmIni, matVe):
     try:
         tree = ET.parse('alquileres.xml')
         root = tree.getroot()
@@ -139,15 +120,22 @@ def crearAlquiler(dni, fechaIni, fechaFin, kmIni, estado):
         root = Element('alquileres')
         tree = ET.ElementTree(root)
 
-        # Creamos el vehiculo y su atributo
+    # Creamos el vehiculo y su atributo
     alquiler = ET.Element('alquiler')
     id = ET.SubElement(alquiler, 'id').text = str(obtId('alquileres.xml', alquiler))
     alquiler.set('id', id)
+
     # Creamos sus atributos o subelementos
+    ET.SubElement(alquiler, 'id_vehiculo').text = obtIdVe(matVe)
     ET.SubElement(alquiler, 'dni').text = dni
-    ET.SubElement(alquiler, 'fechaIni').text = fechaIni
-    ET.SubElement(alquiler, 'fechaFin').text = fechaFin
-    ET.SubElement(alquiler, 'kmIni').text = str(kmIni)
+    ET.SubElement(alquiler, 'fecha_inicio').text = fechaIni
+    ET.SubElement(alquiler, 'fecha_final').text = fechaFin
+    ET.SubElement(alquiler, 'kilometros_inicio').text = str(kmIni)
+    ET.SubElement(alquiler, 'fecha_devolucion')
+    ET.SubElement(alquiler, 'kilometros_final')
+    ET.SubElement(alquiler, 'precio_final')
+    ET.SubElement(alquiler, 'recargo')
+    ET.SubElement(alquiler, 'estado').text = 'Activo'
 
     # Agregamos el nuevo vehiculo
     root.append(alquiler)
@@ -159,6 +147,89 @@ def crearAlquiler(dni, fechaIni, fechaFin, kmIni, estado):
     eliminarEspacios("alquileres.xml")
     file.close()
 
+def obtIdVe(matVe):
+    tree = ET.parse('vehiculos.xml')
+    root = tree.getroot()
+    for elemento in root.iter('vehiculo'):
+        idVe = elemento.get('id')
+        if(elemento.find('matricula') == matVe):
+            return idVe
+    return -1
+def finAlquiler(fechaDevo, kmFin, id):
+    if (Path('alquileres.xml').exists()):
+        tree = ET.parse('alquileres.xml')
+        root = tree.getroot()
+        for elemento in root.iter('alquiler'):
+            if (elemento.get('id') == id):
+                fechaIni = elemento.find('fecha_inicio')
+                fechaFin = elemento.fidn('fecha_final')
+                idVe = elemento.find('id_vehiculo')
+                elemento.find('fecha_devolucion').text = fechaDevo
+                elemento.find('kilometros_final').text = kmFin
+                elemento.find('precio_final').text = precioFin(fechaIni, fechaFin, idVe)
+                auxFin = datetime.strptime(fechaFin, '%Y-%m-%d')
+                auxDev = datetime.strptime(fechaDevo, '%Y-%m-%d')
+                recargo = elemento.find('recargo')
+                diasR = (auxDev - auxFin).days
+                if (diasR > 0):
+                    recargo.text = diasR * 30
+                else:
+                    recargo.text = 0
+                elemento.find('estado').text = 'Finalizado'
+
+                tree.write('alquileres.xml')
+
+
+def mostrarTodoAlq():
+    if (Path('alquileres.xml').exists()):
+        tree = ET.parse('alquileres.xml')
+        root = tree.getroot()
+        print("========== LISTADO ALQUILERES ==========")
+        for elemento in root.iter('alquiler'):
+            idAlquiler = elemento.get('id')
+            idVehiculo = elemento.find('id_vehiculo')
+            dni = elemento.find('dni')
+            fechaIni = elemento.find('fecha_inicio')
+            fechaFin = elemento.fidn('fecha_final')
+            kmIni = elemento.find('kilometros_inicio')
+            kmFin = elemento.find('kilomtreso_final')
+            precio = elemento.find('precio_final')
+            rec = elemento.find('recargo')
+            est = elemento.find('estado')
+
+            print(f'''****Alquiler****\n
+                    \tId: {idAlquiler}\n
+                    \tId Vehiculo: {idVehiculo}\n
+                    \tDNI Cliente: {dni}\n
+                    \tFecha Inicio: {fechaIni}\n
+                    \tFecha Finalizacion: {fechaFin}\n
+                    \tKilometros Inicio: {kmIni}\n
+                    \tKilometros Finalizacion: {kmFin}\n
+                    \tPrecio Final: {precio}\n        
+                    \tRecargo: {rec}\n
+                    \tEstado: {est}''')
+
+
+
+
+
+    else:
+        print("No hay alquileres aun")
+
+
+def precioFin(fechaIni, fechaFin, idVe):
+    tree = ET.parse('vehiculos.xml')
+    root = tree.getroot()
+    for elemento in root.iter('vehiculo'):
+        if (elemento.get('id') == idVe):
+            tarifa = float(elemento.find('tarifaDia'))
+    fecha1 = datetime.strptime(fechaIni, '%Y-%m-%d')
+    fecha2 = datetime.strptime(fechaFin, '%Y-%m-%d')
+    dias = int((fecha2 - fecha1).days)
+    return tarifa * dias
+
+
+# ******************** FUNCIONES  COMUNES **************************************
 
 def obtId(fichero, etiqueta):
     aux = 1
@@ -166,7 +237,7 @@ def obtId(fichero, etiqueta):
         tree = ET.parse(fichero)
         root = tree.getroot()
         for elemento in root.iter(etiqueta):
-            id = elemento.get("id")
+            id = int(elemento.get("id"))
             if (id > aux):
                 aux = id
     else:
@@ -183,3 +254,11 @@ def eliminarEspacios(fichero):
         with open(fichero, 'w') as file:
             file.write(contenidioSin)
 
+
+def prettify(elem):
+    from xml.etree import ElementTree
+    from xml.dom import minidom
+
+    rough_string = ElementTree.tostring(elem, 'utf-8')
+    reparsed = minidom.parseString(rough_string)
+    return reparsed.toprettyxml(indent="  ")

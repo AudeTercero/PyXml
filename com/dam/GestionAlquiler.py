@@ -1,6 +1,7 @@
 import VerificationExceptions
 import GestionXML
 
+
 def iniAlquiler():
     dni = None
     fechaIni = None
@@ -30,20 +31,38 @@ def iniAlquiler():
                 VerificationExceptions.esNum(aux)
                 kmIni = aux
                 intentos = 0
-                estado = 'Activo'
                 salir = True
         except VerificationExceptions.MisExceptions as err:
             intentos += 1
             print(err)
-    if(intentos < 3):
-        GestionXML.crearAlquiler(dni,fechaIni,fechaFin,kmIni,estado)
+    if (intentos < 3):
+        GestionXML.crearAlquiler(dni, fechaIni, fechaFin, kmIni)
+        print("Guardado correctamente")
     else:
         print("Se han superado el maximo de errores.")
 
 
 def finAlquiler():
-    fechaDevo = input('Introduce la fecha de la devolucion del vehiculo(yyyy-mm-dd):\n')
-    kmFin = input('Introduce el kilometraje final:\n')
+    fechaDevo = None
+    kmFin = None
+    intentos = 0
+    try:
+        if(fechaDevo is None):
+            aux = input('Introduce la fecha de la devolucion del vehiculo(yyyy-mm-dd):\n')
+            VerificationExceptions.formatoFecha(aux)
+            fechaDevo = aux
+            intentos = 0
+        if(kmFin is None):
+            aux = input('Introduce el kilometraje final:\n')
+            VerificationExceptions.esNum(aux)
+            kmFin = aux
+            intentos = 0
+
+    except VerificationExceptions.MisExceptions as err:
+        intentos += 1
+        print(err)
+
+
     # precioFin = (fechaIni - fechaDevo) * tarifaVehiculo
     # recargo = (fechaFin - fechaDevo) * costPenalizacion
     estado = 'Finalizado'
@@ -57,8 +76,8 @@ def modificar():
     switch_dic = {
         'opc1': buscarDni(),
     }
-    #hay que probarlo
-    resulado = switch_dic.get(lista,'opc1')
+    # hay que probarlo
+    resulado = switch_dic.get(lista, 'opc1')
     print()
 
 
@@ -71,7 +90,7 @@ def buscarDni():
 
 
 def mostrarTodos():
-    print()
+    GestionXML.mostrarTodoAlq()
 
 
 def menu():

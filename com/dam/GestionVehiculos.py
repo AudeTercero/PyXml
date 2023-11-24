@@ -1,6 +1,5 @@
 import GestionXML
 
-
 def alta():
     xmlPath = "vehiculos.xml"
     lista = GestionXML.leerVehiculos(xmlPath)
