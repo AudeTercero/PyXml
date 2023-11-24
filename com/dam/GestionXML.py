@@ -172,7 +172,7 @@ def finAlquiler(fechaDevo, kmFin, id):
                 recargo = elemento.find('recargo')
                 diasR = (auxDev - auxFin).days
                 if (diasR > 0):
-                    recargo.text = diasR * 30
+                    recargo.text = diasR * 80
                 else:
                     recargo.text = 0
                 elemento.find('estado').text = 'Finalizado'
@@ -208,11 +208,6 @@ def mostrarTodoAlq():
                     \tPrecio Final: {precio}\n        
                     \tRecargo: {rec}\n
                     \tEstado: {est}''')
-
-
-
-
-
     else:
         print("No hay alquileres aun")
 
