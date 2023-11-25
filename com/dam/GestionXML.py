@@ -3,6 +3,7 @@ from xml.etree.ElementTree import Element, SubElement, Comment, ElementTree
 from pathlib import Path
 from datetime import datetime
 
+
 # ******************** FUNCIONES  VEHICULOS **************************************
 # Funcion para ver si existe la matricula
 def existe_matricula(fichero, matricula):
@@ -15,9 +16,15 @@ def existe_matricula(fichero, matricula):
     return False
 
 
+def obtener_vehiculo(xml_path, matricula):
+    try:
+        tree = ET.parse(xml_path)
+
+
+# Funcion para mostrar todos los vehiculos guardados
 def leer_vehiculos(xml_path):
     if Path(xml_path).exists():
-        tree = ET.parse('vehiculos.xml')
+        tree = ET.parse(xml_path)
         root = tree.getroot()
 
         if not root.findall('vehiculo'):
@@ -44,6 +51,7 @@ Estado: {estado}
 ***********************''')
 
 
+# Funcion para guardar vehiculos
 def aniadir_vehiculo(matricula, marca, modelo, anio_fabricacion, tarifa_dia, estado, xml_path):
     try:
         tree = ET.parse(xml_path)
@@ -54,8 +62,7 @@ def aniadir_vehiculo(matricula, marca, modelo, anio_fabricacion, tarifa_dia, est
 
     # Creamos el vehiculo y su atributo
     vehiculo = ET.Element('vehiculo')
-    id = ET.SubElement(vehiculo, 'id').text = str(obtId(xml_path, vehiculo))
-    vehiculo.set('id', id)
+    vehiculo.set('id', str(obtId(xml_path, "vehiculo")))
 
     # Creamos sus atributos o subelementos
     ET.SubElement(vehiculo, 'matricula').text = matricula
@@ -77,6 +84,7 @@ def aniadir_vehiculo(matricula, marca, modelo, anio_fabricacion, tarifa_dia, est
     eliminarEspacios("vehiculos.xml")
 
 
+# Funcion para eliminar vehiculos guardados
 def eliminar_vehiculo(matricula, xml_path):
     vehiculo_encontrado = False
     try:
@@ -120,6 +128,7 @@ def eliminar_vehiculo(matricula, xml_path):
         print(f"Error: {e}")
 
 
+# Funcion para modificar vehiculos guardados
 def modificar_vehiculo(matricula, xml_path):
     vehiculo_encontrado = False
     try:
@@ -147,7 +156,7 @@ def modificar_vehiculo(matricula, xml_path):
                             nuevo_id = input("Ingresa el nuevo ID del vehiculo")
                             if existe_id(xml_path, nuevo_id, "vehiculo") is not True:
                                 id_valido = True
-                                modificar_etiqueta(xml_path, "vehiculo", "id", vehiculo.find("id").text, nuevo_id)
+                                modificar_atributo(xml_path, "vehiculo",vehiculo.get("id"), nuevo_id)
                             else:
                                 print("El ID introducido ya pertenece a un vehiculo existente.")
 
@@ -158,29 +167,29 @@ def modificar_vehiculo(matricula, xml_path):
                             nueva_mat = input("Ingresa la nueva matricula del vehiculo")
                             if existe_matricula(xml_path, nueva_mat) is not True:
                                 mat_valida = True
-                                modificar_etiqueta(xml_path, "vehiculo", "id", vehiculo.find("id").text, mat_valida)
+                                modificar_etiqueta(xml_path, "vehiculo", "matricula", vehiculo.find("matricula").text, mat_valida)
                             else:
                                 print("La matricula introducida ya pertenece a un vehiculo existente.")
 
                     elif opc == "3":
                         nuevaMarca = input("Ingrese la nueva marca del vehículo: ")
-                        modificar_etiqueta(xml_path, "vehiculo", "id", vehiculo.find("id").text, nuevaMarca)
+                        modificar_etiqueta(xml_path, "vehiculo", "descripcion/marca", vehiculo.find("descripcion/marca").text, nuevaMarca)
 
                     elif opc == "4":
                         nuevoModelo = input("Ingrese el nuevo modelo del vehículo: ")
-                        modificar_etiqueta(xml_path, "vehiculo", "id", vehiculo.find("id").text, nuevoModelo)
+                        modificar_etiqueta(xml_path, "vehiculo", "descripcion/modelo", vehiculo.find("descripcion/modelo").text, nuevoModelo)
 
                     elif opc == "5":
                         nuevoAnio = int(input("Ingrese el nuevo año de fabricación del vehículo: "))
-                        modificar_etiqueta(xml_path, "vehiculo", "id", vehiculo.find("id").text, nuevoAnio)
+                        modificar_etiqueta(xml_path, "vehiculo", "anioFabricacion", vehiculo.find("anioFabricacion").text, nuevoAnio)
 
                     elif opc == "6":
                         nuevaTarifa = float(input("Ingrese la nueva tarifa por día del vehículo: "))
-                        modificar_etiqueta(xml_path, "vehiculo", "id", vehiculo.find("id").text, nuevaTarifa)
+                        modificar_etiqueta(xml_path, "vehiculo", "tarifaDia", vehiculo.find("tarifaDia").text, nuevaTarifa)
 
                     elif opc == "7":
                         nuevoEstado = input("Ingrese el nuevo estado del vehículo: ")
-                        modificar_etiqueta(xml_path, "vehiculo", "id", vehiculo.find("id").text, nuevoEstado)
+                        modificar_etiqueta(xml_path, "vehiculo", "estado", vehiculo.find("estado").text, nuevoEstado)
 
                     elif opc == "0":
                         salir = True
@@ -198,6 +207,7 @@ def modificar_vehiculo(matricula, xml_path):
         print(f"Error: {e}")
 
 
+# Funcion para buscar vehiculos guardados
 def buscar_vehiculo(matricula, xml_path):
     try:
         tree = ET.parse(xml_path)
@@ -242,7 +252,7 @@ def crearAlquiler(dni, fechaIni, fechaFin, kmIni, idVe):
 
     # Creamos el vehiculo y su atributo
     alquiler = ET.Element('alquiler')
-    id = ET.SubElement(alquiler, 'id').text = str(obtId('alquileres.xml', alquiler))
+    id = ET.SubElement(alquiler, 'id').text = str(obtId('alquileres.xml', "alquiler"))
     alquiler.set('id', id)
 
     # Creamos sus atributos o subelementos
@@ -406,7 +416,7 @@ def obtId(fichero, etiqueta):
         root = tree.getroot()
         for elemento in root.iter(etiqueta):
             id = int(elemento.get("id"))
-            if (id > aux):
+            if (id >= aux):
                 aux = id
     else:
         return aux
@@ -467,12 +477,27 @@ def existe_id(fichero, id, etiquieta):
         if (id == id_aux):
             return True
     return False
-def modificar_atributo(fichero, iterable, id_alquiler, textoCambio):
+
+
+def modificar_atributo(fichero, iterable, id_elemento, textoCambio):
+    salir = False
     tree = ET.parse(fichero)
     root = tree.getroot()
+
     for elemento in root.iter(iterable):
         id = elemento.get('id')
-        if (id == id_alquiler):
-            elemento.set("id",textoCambio)
+        if (id == id_elemento):
+            elemento.set("id", textoCambio)
 
-    tree.write(fichero)
+    while not salir:
+        op = input("Quieres guardar los cambios generados?[S/N]").lower()
+
+        if op == "s":
+            tree.write(fichero)
+            salir = True
+            print("Cambios guardados, saliendo...")
+        elif op == "n":
+            salir = True;
+            print("Saliendo sin guardar...")
+        else:
+            print("Entrada no valida.")
