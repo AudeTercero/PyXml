@@ -3,7 +3,19 @@ from xml.etree.ElementTree import Element, SubElement, Comment, ElementTree
 from pathlib import Path
 from datetime import datetime
 
+# ******************** FUNCIONES  VEHICULOS **************************************
 
+# Funcion para ver si existe la matricula
+def existe_matricula(fichero, matricula):
+    tree = ET.parse(fichero)
+    root = tree.getroot()
+    for elemento in root.iter('vehiculo'):
+        mat_aux = elemento.get('matricula')
+        if (matricula == mat_aux):
+            return True
+    return False
+
+# Funcion para mostrar todos los vehiculos guardados
 def leer_vehiculos(xml_path):
     if Path(xml_path).exists():
         tree = ET.parse('vehiculos.xml')
@@ -32,7 +44,7 @@ Tarifa Diaria: {tarifa_dia}
 Estado: {estado}        
 ***********************''')
 
-
+# Funcion para guardar nuevos vehiculos
 def aniadir_vehiculo(matricula, marca, modelo, anio_fabricacion, tarifa_dia, estado, xml_path):
     try:
         tree = ET.parse(xml_path)
@@ -128,45 +140,51 @@ def modificar_vehiculo(matricula, xml_path):
                         "\n 5. Modificar Anio de Fabricacion \n 6. Modificar Tarifa Diaria\n 7. Modificar estado "
                         "\n 0. Guardar y salir \n")
 
-                    #Hay que controlar que no se repitan id ni matricula
+                    # Hay que controlar que no se repitan id ni matricula
                     if opc == "1":
-                        nuevo_id = input("Ingresa el nuevo ID del vehiculo")
+                        id_valido = False
+
+                        while not id_valido:
+                            nuevo_id = input("Ingresa el nuevo ID del vehiculo")
+                            if existe_id(xml_path, nuevo_id, "vehiculo") is not True:
+                                id_valido = True
+                                modificar_etiqueta(xml_path, "vehiculo", "id", vehiculo.find("id").text, nuevo_id)
+                            else:
+                                print("El ID introducido ya pertenece a un vehiculo existente.")
 
                     elif opc == "2":
-                        nuevaMatricula = input("Ingrese la nueva matrícula del vehículo: ")
-                        vehiculo.find("matricula").text = nuevaMatricula
+                        mat_valida = False
+
+                        while not mat_valida:
+                            nueva_mat = input("Ingresa la nueva matricula del vehiculo")
+                            if existe_matricula(xml_path, nueva_mat) is not True:
+                                mat_valida = True
+                                modificar_etiqueta(xml_path, "vehiculo", "id", vehiculo.find("id").text, mat_valida)
+                            else:
+                                print("La matricula introducida ya pertenece a un vehiculo existente.")
+
                     elif opc == "3":
                         nuevaMarca = input("Ingrese la nueva marca del vehículo: ")
-                        vehiculo.find("matricula").text = nuevaMatricula
+                        modificar_etiqueta(xml_path, "vehiculo", "id", vehiculo.find("id").text, nuevaMarca)
 
                     elif opc == "4":
                         nuevoModelo = input("Ingrese el nuevo modelo del vehículo: ")
-                        vehiculo.find("matricula").text = nuevaMatricula
+                        modificar_etiqueta(xml_path, "vehiculo", "id", vehiculo.find("id").text, nuevoModelo)
 
                     elif opc == "5":
                         nuevoAnio = int(input("Ingrese el nuevo año de fabricación del vehículo: "))
-                        vehiculo.find("matricula").text = nuevaMatricula
+                        modificar_etiqueta(xml_path, "vehiculo", "id", vehiculo.find("id").text, nuevoAnio)
 
                     elif opc == "6":
                         nuevaTarifa = float(input("Ingrese la nueva tarifa por día del vehículo: "))
-                        vehiculo.find("matricula").text = nuevaMatricula
+                        modificar_etiqueta(xml_path, "vehiculo", "id", vehiculo.find("id").text, nuevaTarifa)
 
                     elif opc == "7":
                         nuevoEstado = input("Ingrese el nuevo estado del vehículo: ")
-                        vehiculo.find("matricula").text = nuevaMatricula
+                        modificar_etiqueta(xml_path, "vehiculo", "id", vehiculo.find("id").text, nuevoEstado)
 
                     elif opc == "0":
-                        while not salir:
-                            op = input("Quieres guardar los cambios generados?[S/N]").lower()
-                            if op == "s":
-                                tree.write(xml_path)
-                                salir = True
-                                print("Cambios guardados, saliendo...")
-                            elif op == "n":
-                                salir = True;
-                                print("Saliendo sin guardar...")
-                            else:
-                                print("Entrada no valida.")
+                        salir = True
 
                     else:
                         print("Esa opcion no existe")
@@ -414,17 +432,31 @@ def prettify(elem):
     reparsed = minidom.parseString(rough_string)
     return reparsed.toprettyxml(indent="  ")
 
+
 # Funcion para modificar el texto de un elemento(ESTO VA EN GESTIONXML)
-def modificar_etiqueta(etiqueta, id_alquiler, textoCambio):
-    tree = ET.parse('alquileres.xml')
+def modificar_etiqueta(fichero, iterable, etiqueta, id_elemento, texto_cambio):
+    salir = False
+    tree = ET.parse(fichero)
     root = tree.getroot()
-    for elemento in root.iter('alquiler'):
+
+    for elemento in root.iter(iterable):
         id = elemento.get('id')
         elem = elemento.find(etiqueta)
-        if (id == id_alquiler):
-            elem.text = textoCambio
+        if id == id_elemento:
+            elem.text = texto_cambio
 
-    tree.write('alquleres.xml')
+    while not salir:
+        op = input("Quieres guardar los cambios generados?[S/N]").lower()
+
+        if op == "s":
+            tree.write(fichero)
+            salir = True
+            print("Cambios guardados, saliendo...")
+        elif op == "n":
+            salir = True;
+            print("Saliendo sin guardar...")
+        else:
+            print("Entrada no valida.")
 
 
 # Funcion para ver si existe la id
