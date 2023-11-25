@@ -4,8 +4,8 @@ from pathlib import Path
 from datetime import datetime
 
 
-def leerVehiculos(xmlPath):
-    if (Path(xmlPath).exists()):
+def leer_vehiculos(xml_path):
+    if Path(xml_path).exists():
         tree = ET.parse('vehiculos.xml')
         root = tree.getroot()
 
@@ -14,29 +14,28 @@ def leerVehiculos(xmlPath):
         else:
             print("========== LISTADO VEHICULOS ==========")
             for elemento in root.iter('vehiculo'):
-                idVehiculo = elemento.get('id')
+                id_vehiculo = elemento.get('id')
                 matricula = elemento.find('matricula').text
                 marca = elemento.find('descripcion/marca').text
                 modelo = elemento.find('descripcion/modelo').text
-                anioFabricacion = elemento.find('anioFabricacion').text
-                tarifaDia = elemento.find('tarifaDia').text
+                anio_fabricacion = elemento.find('anioFabricacion').text
+                tarifa_dia = elemento.find('tarifaDia').text
                 estado = elemento.find('estado').text
 
                 print(f'''****VEHICULO****
-                    Id: {idVehiculo}
-                    Matricula: {matricula}
-                    Marca: {marca}
-                    Modelo: {modelo}
-                    Anio de Fabricacion: {anioFabricacion}
-                    Tarifa Diaria: {tarifaDia}
-                    Estado: {estado}        
-                    ***********************''')
+Id: {id_vehiculo}
+Matricula: {matricula}
+Marca: {marca}
+Modelo: {modelo}
+Anio de Fabricacion: {anio_fabricacion}
+Tarifa Diaria: {tarifa_dia}
+Estado: {estado}        
+***********************''')
 
 
-def aniadirVehiculo(matricula, marca, modelo, anioFabricacion, tarifaDia, estado, xmlPath):  # Mirar tema ID
-
+def aniadir_vehiculo(matricula, marca, modelo, anio_fabricacion, tarifa_dia, estado, xml_path):
     try:
-        tree = ET.parse(xmlPath)
+        tree = ET.parse(xml_path)
         root = tree.getroot()
     except FileNotFoundError:
         root = Element('vehiculos')
@@ -44,7 +43,7 @@ def aniadirVehiculo(matricula, marca, modelo, anioFabricacion, tarifaDia, estado
 
     # Creamos el vehiculo y su atributo
     vehiculo = ET.Element('vehiculo')
-    id = ET.SubElement(vehiculo, 'id').text = str(obtId(xmlPath, vehiculo))
+    id = ET.SubElement(vehiculo, 'id').text = str(obtId(xml_path, vehiculo))
     vehiculo.set('id', id)
 
     # Creamos sus atributos o subelementos
@@ -52,8 +51,8 @@ def aniadirVehiculo(matricula, marca, modelo, anioFabricacion, tarifaDia, estado
     descripcion = ET.SubElement(vehiculo, 'descripcion')
     ET.SubElement(descripcion, 'marca').text = marca
     ET.SubElement(descripcion, 'modelo').text = modelo
-    ET.SubElement(vehiculo, 'anioFabricacion').text = str(anioFabricacion)
-    ET.SubElement(vehiculo, 'tarifaDia').text = str(tarifaDia)
+    ET.SubElement(vehiculo, 'anioFabricacion').text = str(anio_fabricacion)
+    ET.SubElement(vehiculo, 'tarifaDia').text = str(tarifa_dia)
     ET.SubElement(vehiculo, 'estado').text = estado
 
     # Agregamos el nuevo vehiculo
@@ -67,51 +66,40 @@ def aniadirVehiculo(matricula, marca, modelo, anioFabricacion, tarifaDia, estado
     eliminarEspacios("vehiculos.xml")
 
 
-def eliminarVehiculo(matricula, xmlPath):
+def eliminar_vehiculo(matricula, xml_path):
+    vehiculo_encontrado = False
     try:
-        tree = ET.parse(xmlPath)
+        tree = ET.parse(xml_path)
         root = tree.getroot()
 
-        # Buscamos el vehiculo
-        vehiculoBuscado = None
-
+        # Buscamos el vehiculo con la matricula indicada por el usuario
         for vehiculo in root.findall('vehiculo'):
-            matVehi = vehiculo.find('matricula').text
-            if (matVehi == matricula):
-                vehiculoBuscado = vehiculo
+            mat_vehi = vehiculo.find('matricula').text
+            if (mat_vehi == matricula):
+                vehiculo_buscado = vehiculo
 
         # Si lo encuentra, eliminamos el vehiculo
-        if vehiculo is not None:
-            root.remove(vehiculo)
-            tree.write(xmlPath)
-            print("El vehiculo ha sido eliminado")
-        else:
-            print("El vehiculo no se ha podido eliminar")
+        if vehiculo_buscado is not None:
+            vehiculo_encontrado = True
+            salir = False
 
-    except FileNotFoundError:
-        print("No hay vehiculos guardados")
-    except Exception as e:
-        print(f"Error: {e}")
+            # Preguntamos si desea eliminar el vehiculo, de ser asi lo borramos
+            while not salir:
+                op = input("Seguro que quieres borrar el vehiculo? [S/N]").lower()
+                if (op == "s"):
+                    root.remove(vehiculo_buscado)
+                    tree.write(xml_path)
+                    print("El vehiculo ha sido eliminado")
+                    salir = True;
+                elif (op == "n"):
+                    print("Saliendo...")
+                else:
+                    print("Opcion no valida.")
 
+        # Si no lo encuentra, lo indicamos
+        if not vehiculo_encontrado:
+            print("No se encontro el vehiculo")
 
-def modificar_vehiculo(matricula, xmlPath):
-    try:
-        tree = ET.parse(xmlPath)
-        root = tree.getroot()
-
-        # Buscamos el vehiculo
-        vehiculoBuscado = None
-
-        for vehiculo in root.findall('vehiculo'):
-            matVehi = vehiculo.find('matricula').text
-            if (matVehi == matricula):
-                vehiculoBuscado = vehiculo
-
-        # Si lo encuentra, modificamos el vehiculo
-        if vehiculo is not None:
-            root.remove(vehiculo)
-            tree.write(xmlPath)
-            print("El vehiculo ha sido eliminado")
         else:
             print("El vehiculo no se ha podido encontrar")
 
@@ -121,8 +109,109 @@ def modificar_vehiculo(matricula, xmlPath):
         print(f"Error: {e}")
 
 
-def buscar_vehiculo():
-    print()
+def modificar_vehiculo(matricula, xml_path):
+    vehiculo_encontrado = False
+    try:
+        tree = ET.parse(xml_path)
+        root = tree.getroot()
+
+        for vehiculo in root.findall('vehiculo'):
+            mat_vehi = vehiculo.find('matricula').text
+
+            if mat_vehi == matricula:
+                vehiculo_encontrado = True
+                salir = False
+
+                while not salir:
+                    opc = input(
+                        "\tSelecciona una opcion:\n 1. Modificar ID \n 2. Modificar Matricula\n 3. Modificar Marca\n 4. Modificar Modelo"
+                        "\n 5. Modificar Anio de Fabricacion \n 6. Modificar Tarifa Diaria\n 7. Modificar estado "
+                        "\n 0. Guardar y salir \n")
+
+                    #Hay que controlar que no se repitan id ni matricula
+                    if opc == "1":
+                        nuevo_id = input("Ingresa el nuevo ID del vehiculo")
+
+                    elif opc == "2":
+                        nuevaMatricula = input("Ingrese la nueva matrícula del vehículo: ")
+                        vehiculo.find("matricula").text = nuevaMatricula
+                    elif opc == "3":
+                        nuevaMarca = input("Ingrese la nueva marca del vehículo: ")
+                        vehiculo.find("matricula").text = nuevaMatricula
+
+                    elif opc == "4":
+                        nuevoModelo = input("Ingrese el nuevo modelo del vehículo: ")
+                        vehiculo.find("matricula").text = nuevaMatricula
+
+                    elif opc == "5":
+                        nuevoAnio = int(input("Ingrese el nuevo año de fabricación del vehículo: "))
+                        vehiculo.find("matricula").text = nuevaMatricula
+
+                    elif opc == "6":
+                        nuevaTarifa = float(input("Ingrese la nueva tarifa por día del vehículo: "))
+                        vehiculo.find("matricula").text = nuevaMatricula
+
+                    elif opc == "7":
+                        nuevoEstado = input("Ingrese el nuevo estado del vehículo: ")
+                        vehiculo.find("matricula").text = nuevaMatricula
+
+                    elif opc == "0":
+                        while not salir:
+                            op = input("Quieres guardar los cambios generados?[S/N]").lower()
+                            if op == "s":
+                                tree.write(xml_path)
+                                salir = True
+                                print("Cambios guardados, saliendo...")
+                            elif op == "n":
+                                salir = True;
+                                print("Saliendo sin guardar...")
+                            else:
+                                print("Entrada no valida.")
+
+                    else:
+                        print("Esa opcion no existe")
+
+        # Si no lo encuentra, lo indicamos
+        if not vehiculo_encontrado:
+            print("No se encontro el vehiculo")
+
+    except FileNotFoundError:
+        print("No hay vehiculos guardados")
+    except Exception as e:
+        print(f"Error: {e}")
+
+
+def buscar_vehiculo(matricula, xml_path):
+    try:
+        tree = ET.parse(xml_path)
+        root = tree.getroot()
+
+        for vehiculo in root.findall('vehiculo'):
+            mat_vehi = vehiculo.find('matricula').text
+
+            if mat_vehi == matricula:
+                id_vehiculo = vehiculo.get('id')
+                matricula = vehiculo.find('matricula').text
+                marca = vehiculo.find('descripcion/marca').text
+                modelo = vehiculo.find('descripcion/modelo').text
+                anio_fabricacion = vehiculo.find('anioFabricacion').text
+                tarifa_dia = vehiculo.find('tarifaDia').text
+                estado = vehiculo.find('estado').text
+
+                print(f'''****VEHICULO****
+ Id: {id_vehiculo}
+ Matricula: {matricula}
+ Marca: {marca}
+ Modelo: {modelo}
+ Anio de Fabricacion: {anio_fabricacion}
+ Tarifa Diaria: {tarifa_dia}
+ Estado: {estado}        
+ ***********************''')
+
+    except FileNotFoundError:
+        print("No hay vehiculos guardados")
+    except Exception as e:
+        print(f"Error: {e}")
 
 
 # ******************** FUNCIONES  ALQUILER **************************************
@@ -221,17 +310,17 @@ def mostrarTodoAlq():
                 est = elemento.find('estado').text
 
                 print(f'''****Alquiler****
-                    Id: {idAlquiler}
-                    Id Vehiculo: {idVehiculo}
-                    DNI Cliente: {dni}
-                    Fecha Inicio: {fechaIni}
-                    Fecha Finalizacion: {fechaFin}
-                    Kilometros Inicio: {kmIni}
-                    Kilometros Finalizacion: {kmFin}
-                    Precio Final: {precio}        
-                    Recargo: {rec}
-                    Estado: {est}
-                    ***********************''')
+Id: {idAlquiler}
+Id Vehiculo: {idVehiculo}
+DNI Cliente: {dni}
+Fecha Inicio: {fechaIni}
+Fecha Finalizacion: {fechaFin}
+Kilometros Inicio: {kmIni}
+Kilometros Finalizacion: {kmFin}
+Precio Final: {precio}        
+Recargo: {rec}
+Estado: {est}
+***********************''')
     else:
         print("No hay alquileres aun")
 
@@ -263,6 +352,7 @@ def listado_coches_disponibles():
 
     return dicVeh
 
+
 def diponibles():
     tree = ET.parse('vehiculos.xml')
     root = tree.getroot()
@@ -273,6 +363,7 @@ def diponibles():
             return True
 
     return False
+
 
 def alquiDisp(dniRec):
     if (Path('alquileres.xml').exists()):
