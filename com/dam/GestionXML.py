@@ -4,7 +4,6 @@ from pathlib import Path
 from datetime import datetime
 
 # ******************** FUNCIONES  VEHICULOS **************************************
-
 # Funcion para ver si existe la matricula
 def existe_matricula(fichero, matricula):
     tree = ET.parse(fichero)
@@ -15,7 +14,7 @@ def existe_matricula(fichero, matricula):
             return True
     return False
 
-# Funcion para mostrar todos los vehiculos guardados
+
 def leer_vehiculos(xml_path):
     if Path(xml_path).exists():
         tree = ET.parse('vehiculos.xml')
@@ -44,7 +43,7 @@ Tarifa Diaria: {tarifa_dia}
 Estado: {estado}        
 ***********************''')
 
-# Funcion para guardar nuevos vehiculos
+
 def aniadir_vehiculo(matricula, marca, modelo, anio_fabricacion, tarifa_dia, estado, xml_path):
     try:
         tree = ET.parse(xml_path)
