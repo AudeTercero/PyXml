@@ -82,6 +82,7 @@ def aniadirVehiculo(matricula, marca, modelo, anioFabricacion, tarifaDia, estado
     file = open("vehiculos.xml", "w")
     file.write(salida)
     file.close()
+    eliminarEspacios("vehiculos.xml")
 
 
 def eliminarVehiculo(matricula, xmlPath):
@@ -112,7 +113,7 @@ def eliminarVehiculo(matricula, xmlPath):
 
 
 # ******************** FUNCIONES  ALQUILER **************************************
-def crearAlquiler(dni, fechaIni, fechaFin, kmIni, matVe):
+def crearAlquiler(dni, fechaIni, fechaFin, kmIni, idVe):
     try:
         tree = ET.parse('alquileres.xml')
         root = tree.getroot()
@@ -126,15 +127,15 @@ def crearAlquiler(dni, fechaIni, fechaFin, kmIni, matVe):
     alquiler.set('id', id)
 
     # Creamos sus atributos o subelementos
-    ET.SubElement(alquiler, 'id_vehiculo').text = obtIdVe(matVe)
+    ET.SubElement(alquiler, 'id_vehiculo').text = idVe
     ET.SubElement(alquiler, 'dni').text = dni
     ET.SubElement(alquiler, 'fecha_inicio').text = fechaIni
     ET.SubElement(alquiler, 'fecha_final').text = fechaFin
     ET.SubElement(alquiler, 'kilometros_inicio').text = str(kmIni)
-    ET.SubElement(alquiler, 'fecha_devolucion')
-    ET.SubElement(alquiler, 'kilometros_final')
-    ET.SubElement(alquiler, 'precio_final')
-    ET.SubElement(alquiler, 'recargo')
+    ET.SubElement(alquiler, 'fecha_devolucion').text = ''
+    ET.SubElement(alquiler, 'kilometros_final').text = ''
+    ET.SubElement(alquiler, 'precio_final').text = ''
+    ET.SubElement(alquiler, 'recargo').text = ''
     ET.SubElement(alquiler, 'estado').text = 'Activo'
 
     # Agregamos el nuevo vehiculo
@@ -146,35 +147,40 @@ def crearAlquiler(dni, fechaIni, fechaFin, kmIni, matVe):
     file.write(salida)
     eliminarEspacios("alquileres.xml")
     file.close()
+    eliminarEspacios('alquileres.xml')
+
 
 def obtIdVe(matVe):
     tree = ET.parse('vehiculos.xml')
     root = tree.getroot()
     for elemento in root.iter('vehiculo'):
         idVe = elemento.get('id')
-        if(elemento.find('matricula') == matVe):
+        if (elemento.find('matricula') == matVe):
             return idVe
     return -1
+
+
 def finAlquiler(fechaDevo, kmFin, id):
     if (Path('alquileres.xml').exists()):
         tree = ET.parse('alquileres.xml')
         root = tree.getroot()
         for elemento in root.iter('alquiler'):
             if (elemento.get('id') == id):
-                fechaIni = elemento.find('fecha_inicio')
-                fechaFin = elemento.fidn('fecha_final')
-                idVe = elemento.find('id_vehiculo')
+                fechaIni = elemento.find('fecha_inicio').text
+                fechaFin = elemento.find('fecha_final').text
+                idVe = elemento.find('id_vehiculo').text
                 elemento.find('fecha_devolucion').text = fechaDevo
                 elemento.find('kilometros_final').text = kmFin
-                elemento.find('precio_final').text = precioFin(fechaIni, fechaFin, idVe)
                 auxFin = datetime.strptime(fechaFin, '%Y-%m-%d')
                 auxDev = datetime.strptime(fechaDevo, '%Y-%m-%d')
+                preciFin = elemento.find('precio_final')
                 recargo = elemento.find('recargo')
                 diasR = (auxDev - auxFin).days
                 if (diasR > 0):
                     recargo.text = diasR * 80
                 else:
                     recargo.text = 0
+                preciFin.text = str(precioFin(fechaIni, fechaFin, idVe) + int(recargo.text))
                 elemento.find('estado').text = 'Finalizado'
 
                 tree.write('alquileres.xml')
@@ -187,27 +193,28 @@ def mostrarTodoAlq():
         print("========== LISTADO ALQUILERES ==========")
         for elemento in root.iter('alquiler'):
             idAlquiler = elemento.get('id')
-            idVehiculo = elemento.find('id_vehiculo')
-            dni = elemento.find('dni')
-            fechaIni = elemento.find('fecha_inicio')
-            fechaFin = elemento.fidn('fecha_final')
-            kmIni = elemento.find('kilometros_inicio')
-            kmFin = elemento.find('kilomtreso_final')
-            precio = elemento.find('precio_final')
-            rec = elemento.find('recargo')
-            est = elemento.find('estado')
+            idVehiculo = elemento.find('id_vehiculo').text
+            dni = elemento.find('dni').text
+            fechaIni = elemento.find('fecha_inicio').text
+            fechaFin = elemento.find('fecha_final').text
+            kmIni = elemento.find('kilometros_inicio').text
+            kmFin = elemento.find('kilometros_final').text
+            precio = elemento.find('precio_final').text
+            rec = elemento.find('recargo').text
+            est = elemento.find('estado').text
 
-            print(f'''****Alquiler****\n
-                    \tId: {idAlquiler}\n
-                    \tId Vehiculo: {idVehiculo}\n
-                    \tDNI Cliente: {dni}\n
-                    \tFecha Inicio: {fechaIni}\n
-                    \tFecha Finalizacion: {fechaFin}\n
-                    \tKilometros Inicio: {kmIni}\n
-                    \tKilometros Finalizacion: {kmFin}\n
-                    \tPrecio Final: {precio}\n        
-                    \tRecargo: {rec}\n
-                    \tEstado: {est}''')
+            print(f'''****Alquiler****
+Id: {idAlquiler}
+Id Vehiculo: {idVehiculo}
+DNI Cliente: {dni}
+Fecha Inicio: {fechaIni}
+Fecha Finalizacion: {fechaFin}
+Kilometros Inicio: {kmIni}
+Kilometros Finalizacion: {kmFin}
+Precio Final: {precio}        
+Recargo: {rec}
+Estado: {est}
+***********************''')
     else:
         print("No hay alquileres aun")
 
@@ -217,11 +224,42 @@ def precioFin(fechaIni, fechaFin, idVe):
     root = tree.getroot()
     for elemento in root.iter('vehiculo'):
         if (elemento.get('id') == idVe):
-            tarifa = float(elemento.find('tarifaDia'))
+            tarifa = float(elemento.find('tarifaDia').text)
     fecha1 = datetime.strptime(fechaIni, '%Y-%m-%d')
     fecha2 = datetime.strptime(fechaFin, '%Y-%m-%d')
     dias = int((fecha2 - fecha1).days)
     return tarifa * dias
+
+
+def cochesDisp():
+    tree = ET.parse('vehiculos.xml')
+    root = tree.getroot()
+    dicVeh = {}
+    for elemento in root.iter('vehiculo'):
+        idVe = elemento.get('id')
+        matVe = elemento.find('matricula').text
+        marca = elemento.find('descripcion/marca').text
+        modelo = elemento.find('descripcion/modelo').text
+        estado = elemento.find('estado').text
+        if (estado == 'disponible'):
+            dicVeh[idVe] = {'mat': matVe, 'marca': marca, 'modelo': modelo}
+
+    return dicVeh
+
+
+def alquiDisp(dniRec):
+    if (Path('alquileres.xml').exists()):
+        tree = ET.parse('alquileres.xml')
+        root = tree.getroot()
+        dicAlq = {}
+        for elemento in root.iter('alquiler'):
+            idAlq = elemento.get('id')
+            idVeh = elemento.find('id_vehiculo').text
+            dni = elemento.find('dni').text
+            fechaIni = elemento.find('fecha_inicio').text
+            if (dni == dniRec):
+                dicAlq[idAlq] = {'Id_Vehiculo': idVeh, 'Dni': dni, 'Fecha_Inicio': fechaIni}
+        return dicAlq
 
 
 # ******************** FUNCIONES  COMUNES **************************************
