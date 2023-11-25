@@ -413,3 +413,26 @@ def prettify(elem):
     rough_string = ElementTree.tostring(elem, 'utf-8')
     reparsed = minidom.parseString(rough_string)
     return reparsed.toprettyxml(indent="  ")
+
+# Funcion para modificar el texto de un elemento(ESTO VA EN GESTIONXML)
+def modificar_etiqueta(etiqueta, id_alquiler, textoCambio):
+    tree = ET.parse('alquileres.xml')
+    root = tree.getroot()
+    for elemento in root.iter('alquiler'):
+        id = elemento.get('id')
+        elem = elemento.find(etiqueta)
+        if (id == id_alquiler):
+            elem.text = textoCambio
+
+    tree.write('alquleres.xml')
+
+
+# Funcion para ver si existe la id
+def existe_id(fichero, id, etiquieta):
+    tree = ET.parse(fichero)
+    root = tree.getroot()
+    for elemento in root.iter(etiquieta):
+        id_aux = elemento.get('id')
+        if (id == id_aux):
+            return True
+    return False

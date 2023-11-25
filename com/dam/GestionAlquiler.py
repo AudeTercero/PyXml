@@ -1,8 +1,8 @@
 from pathlib import Path
-
+import xml.etree.ElementTree as ET
+from xml.etree.ElementTree import Element, SubElement, Comment, ElementTree
 import VerificationExceptions
 import GestionXML
-
 
 
 def iniAlquiler():
@@ -135,16 +135,108 @@ def alquilerDni():
 
 
 def modificar():
-    lista = {}
+    salir = False
+    id_alquiler = None
+    while (salir is False):
+        idAlq = alquilerDni()
+        if (idAlq != -1):
+            opc = input(''' 
+            ******* MODIFICACION ALQUILER *******
+            1.Id del Alquiler
+            2.Id del Vehiculo
+            3.Dni cliente
+            4.Fecha Inicio del Alquiler
+            5.Fecha Fin del Alquiler
+            6.Kilometraje inicial
+            0.Salir
+            ''')
+            if opc == "1":
+                modificador_ids('id', id_alquiler, 'alquileres.xml')
+            elif opc == "2":
+                modificador_ids('id_vehiculo', id_alquiler, 'vehiculos.xml')
+            elif opc == "3":
+                fallos = 0
+                dni = None
+                while (fallos < 3 and dni is None):
+                    try:
+                        aux = input(f'Escriba el nuevo dni:')
+                        VerificationExceptions.dniFormat(aux)
+                        dni = aux
+                    except VerificationExceptions.MisExceptions as err:
+                        print(err)
+                        fallos += 1
+                if (fallos < 3):
+                    GestionXML.modificar_etiqueta('dni', id_alquiler, dni)
+                else:
+                    print("No puedes fallar mas de 3 veces")
+            elif opc == "4":
+                modificador_fechas('fecha_inicio', id_alquiler)
+            elif opc == "5":
+                modificador_fechas('fecha_final', id_alquiler)
+            elif opc == "6":
+                fallos = 0
+                km = None
+                while (fallos < 3 and km is None):
+                    try:
+                        aux = input(f'Escriba los nuevos kilometros iniciales:')
+                        VerificationExceptions.esNum(aux)
+                        km = aux
+                    except VerificationExceptions.MisExceptions as err:
+                        print(err)
+                        fallos += 1
+                if (fallos < 3):
+                    GestionXML.modificar_etiqueta('kilometros_inicio', id_alquiler, km)
+                else:
+                    print("No puedes fallar mas de 3 veces")
+            elif opc == "0":
+                print("Saliendo...")
+                salir = True
+            else:
+                print("Esa opcion no existe")
+        else:
+            print('No puedes fallar mas de 3 veces')
+            salir = True
 
-    # aqui se puede meter opciones de switch para luego hacer cosas segun las opciones que metamos
-    # se podria usar una lista para asi tener los vehiculos con un menu independiente al numero de vehiculos mostrados para luego mostrarlos
-    switch_dic = {
-        'opc1': buscarDni(),
-    }
-    # hay que probarlo
-    resulado = switch_dic.get(lista, 'opc1')
-    print()
+
+def modificador_ids(etiqueta, id_alquiler, fichero):
+    fallos = 0
+    id = None
+    while (fallos < 3 and id is None):
+        try:
+            aux = input(f'Escriba la nueva {etiqueta}:')
+            VerificationExceptions.esNum(aux)
+            if (GestionXML.existe_id(fichero, aux, etiqueta) is True):
+                id = aux
+            else:
+                fallos += 1
+
+        except VerificationExceptions.MisExceptions as err:
+            print(err)
+            fallos += 1
+    if (fallos < 3):
+        GestionXML.modificar_etiqueta(etiqueta, id_alquiler, id)
+    else:
+        print("No puedes fallar mas de 3 veces")
+
+
+def modificador_fechas(etiqueta, id_alquiler):
+    fallos = 0
+    fecha = None
+    while (fallos < 3 and fecha is None):
+        try:
+            aux = input(f'Escriba la nueva {etiqueta}:')
+            VerificationExceptions.formatoFecha(aux)
+            fecha = aux
+        except VerificationExceptions.MisExceptions as err:
+            print(err)
+            fallos += 1
+    if (fallos < 3):
+        GestionXML.modificar_etiqueta(etiqueta, id_alquiler, fecha)
+    else:
+        print("No puedes fallar mas de 3 veces")
+
+
+
 
 
 def buscarMatricula():
@@ -161,25 +253,25 @@ def mostrarTodos():
 
 def menu():
     if (Path('vehiculos.xml').exists()):
-        salir = True
-        while (salir):
-            opc = input(
-                "\t****GESTION ALQUILER****\n 1. Alquilar Vehiculo\n 2. Finalizar Alquiler\n 3. Modificar\n 4. Buscar por matricula \n 5. Buscar por dni del cliente\n 6. Mostrar alquileres \n  0. Salir\n ")
-
-            if opc == "1":
-                iniAlquiler()
-            elif opc == "2":
-                finAlquiler()
-            elif opc == "3":
-                modificar()
-            elif opc == "4":
-                buscarMatricula()
-            elif opc == "5":
-                buscarDni()
-            elif opc == "6":
-                mostrarTodos()
-            elif opc == "0":
-                print("Saliendo...")
-                salir = False
-            else:
-                print("Esa opcion no existe")
+        if (GestionXML.diponibles() is True):
+            salir = True
+            while (salir):
+                opc = input(
+                    "\t****GESTION ALQUILER****\n 1. Alquilar Vehiculo\n 2. Finalizar Alquiler\n 3. Modificar\n 4. Buscar por matricula \n 5. Buscar por dni del cliente\n 6. Mostrar alquileres \n  0. Salir\n ")
+                if opc == "1":
+                    iniAlquiler()
+                elif opc == "2":
+                    finAlquiler()
+                elif opc == "3":
+                    modificar()
+                elif opc == "4":
+                    buscarMatricula()
+                elif opc == "5":
+                    buscarDni()
+                elif opc == "6":
+                    mostrarTodos()
+                elif opc == "0":
+                    print("Saliendo...")
+                    salir = False
+                else:
+                    print("Esa opcion no existe")
