@@ -284,7 +284,7 @@ def obtIdVe(matVe):
     root = tree.getroot()
     for elemento in root.iter('vehiculo'):
         idVe = elemento.get('id')
-        if (elemento.find('matricula') == matVe):
+        if (elemento.find('matricula').text == matVe):
             return idVe
     return -1
 
@@ -405,7 +405,39 @@ def alquiDisp(dniRec):
             if (dni == dniRec):
                 dicAlq[idAlq] = {'Id_Vehiculo': idVeh, 'Dni': dni, 'Fecha_Inicio': fechaIni}
         return dicAlq
-
+# Este metodo va en GestionXMl y hay que modificar la linea 277 de la funcion obtIdVe(matVe) y ponerle .text
+def mostrar_por_elemento(etiqueta, abuscar):
+    tree = ET.parse('alquileres.xml')
+    root = tree.getroot()
+    existencias = False
+    for elemento in root.iter('alquiler'):
+        idAlquiler = elemento.get('id')
+        idVehiculo = elemento.find('id_vehiculo').text
+        dni = elemento.find('dni').text
+        fechaIni = elemento.find('fecha_inicio').text
+        fechaFin = elemento.find('fecha_final').text
+        kmIni = elemento.find('kilometros_inicio').text
+        kmFin = elemento.find('kilometros_final').text
+        precio = elemento.find('precio_final').text
+        rec = elemento.find('recargo').text
+        est = elemento.find('estado').text
+        aux = elemento.find(etiqueta).text
+        if (aux == abuscar):
+            existencias = True
+            print(f'''****Alquiler****
+            Id: {idAlquiler}
+            Id Vehiculo: {idVehiculo}
+            DNI Cliente: {dni}
+            Fecha Inicio: {fechaIni}
+            Fecha Finalizacion: {fechaFin}
+            Kilometros Inicio: {kmIni}
+            Kilometros Finalizacion: {kmFin}
+            Precio Final: {precio}        
+            Recargo: {rec}
+            Estado: {est}
+            ***********************''')
+    if (existencias is False):
+        print(f"No hay alquileres con {etiqueta} = {abuscar}")
 
 # ******************** FUNCIONES  COMUNES **************************************
 
