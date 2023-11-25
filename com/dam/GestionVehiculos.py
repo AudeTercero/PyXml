@@ -98,20 +98,7 @@ def buscar():
 
 def mostrar():
     xmlPath = "vehiculos.xml"
-    lista = GestionXML.leerVehiculos(xmlPath)
-
-    if lista:
-        for vehiculoInfo in lista:
-            print("=== VECHICULO ===")
-            print("ID:", vehiculoInfo[0])
-            print("Matrícula:", vehiculoInfo[1])
-            print("Marca y Modelo:", vehiculoInfo[2])
-            print("Año de Fabricación:", vehiculoInfo[3])
-            print("Tarifa por Día:", vehiculoInfo[4])
-            print("Estado:", vehiculoInfo[5])
-            print("=" * 17)
-    else:
-        print("No hay vehiculos guardados")
+    GestionXML.leerVehiculos(xmlPath)
 
 def menu():
     salir = True

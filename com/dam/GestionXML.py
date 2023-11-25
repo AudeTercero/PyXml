@@ -5,50 +5,32 @@ from datetime import datetime
 
 
 def leerVehiculos(xmlPath):
-    try:
-        tree = ET.parse(xmlPath)
+    if (Path(xmlPath).exists()):
+        tree = ET.parse('vehiculos.xml')
         root = tree.getroot()
-        recorrer(root)
-        '''
-        vehiculosLista = []
 
-        for atributo in root.findall('vehiculo'):
-            vehiculoInfo = []
+        if not root.findall('vehiculo'):
+            print("No hay vehiculos guardados.")
+        else:
+            print("========== LISTADO VEHICULOS ==========")
+            for elemento in root.iter('vehiculo'):
+                idVehiculo = elemento.get('id')
+                matricula = elemento.find('matricula').text
+                marca = elemento.find('descripcion/marca').text
+                modelo = elemento.find('descripcion/modelo').text
+                anioFabricacion = elemento.find('anioFabricacion').text
+                tarifaDia = elemento.find('tarifaDia').text
+                estado = elemento.find('estado').text
 
-            # Extraer informacion de cada elemento dentro de vehiculo
-            id = atributo.find('id').text
-            matricula = atributo.find('matricula').text
-            marca = atributo.find('.//descripcion/marca').text
-            modelo = atributo.find('.//descripcion/modelo').text
-            anoFabricacion = atributo.find('anoFabricacion').text
-            tarifaDia = atributo.find('tarifaDia').text
-            estado = atributo.find('estado').text
-
-            # Agregar la informacion del vehiculo a la lista
-            vehiculoInfo.extend([id, matricula, marca, modelo, anoFabricacion, tarifaDia, estado])
-
-            vehiculosLista.append(vehiculoInfo)
-
-        return vehiculosLista
-        '''
-    except FileNotFoundError:
-        print(f"El archivo {xmlPath} no existe.")
-        return None
-    except Exception as e:
-        print(f"Error al leer el archivo XML: {e}")
-        return None
-
-
-def recorrer(elemento, indent=0):
-    print(elemento.tag, end="")
-    # Para recorrer los atributos. Los atributos estan en un diccionario
-    for attr in elemento.attrib:
-        attrName = attr
-        attrValue = elemento.attrib[attr]
-        print("\t", attrName, ":", attrValue, " ", end="")
-    print("\n\t", elemento.text)
-    for n in elemento:
-        recorrer(n)
+                print(f'''****VEHICULO****
+                    Id: {idVehiculo}
+                    Matricula: {matricula}
+                    Marca: {marca}
+                    Modelo: {modelo}
+                    Anio de Fabricacion: {anioFabricacion}
+                    Tarifa Diaria: {tarifaDia}
+                    Estado: {estado}        
+                    ***********************''')
 
 
 def aniadirVehiculo(matricula, marca, modelo, anioFabricacion, tarifaDia, estado, xmlPath):  # Mirar tema ID
@@ -110,6 +92,37 @@ def eliminarVehiculo(matricula, xmlPath):
         print("No hay vehiculos guardados")
     except Exception as e:
         print(f"Error: {e}")
+
+
+def modificar_vehiculo(matricula, xmlPath):
+    try:
+        tree = ET.parse(xmlPath)
+        root = tree.getroot()
+
+        # Buscamos el vehiculo
+        vehiculoBuscado = None
+
+        for vehiculo in root.findall('vehiculo'):
+            matVehi = vehiculo.find('matricula').text
+            if (matVehi == matricula):
+                vehiculoBuscado = vehiculo
+
+        # Si lo encuentra, modificamos el vehiculo
+        if vehiculo is not None:
+            root.remove(vehiculo)
+            tree.write(xmlPath)
+            print("El vehiculo ha sido eliminado")
+        else:
+            print("El vehiculo no se ha podido encontrar")
+
+    except FileNotFoundError:
+        print("No hay vehiculos guardados")
+    except Exception as e:
+        print(f"Error: {e}")
+
+
+def buscar_vehiculo():
+    print()
 
 
 # ******************** FUNCIONES  ALQUILER **************************************
@@ -177,9 +190,9 @@ def finAlquiler(fechaDevo, kmFin, id):
                 recargo = elemento.find('recargo')
                 diasR = (auxDev - auxFin).days
                 if (diasR > 0):
-                    recargo.text = diasR * 80
+                    recargo.text = str(diasR * 80)
                 else:
-                    recargo.text = 0
+                    recargo.text = str("No hay recargo")
                 preciFin.text = str(precioFin(fechaIni, fechaFin, idVe) + int(recargo.text))
                 elemento.find('estado').text = 'Finalizado'
 
@@ -190,31 +203,35 @@ def mostrarTodoAlq():
     if (Path('alquileres.xml').exists()):
         tree = ET.parse('alquileres.xml')
         root = tree.getroot()
-        print("========== LISTADO ALQUILERES ==========")
-        for elemento in root.iter('alquiler'):
-            idAlquiler = elemento.get('id')
-            idVehiculo = elemento.find('id_vehiculo').text
-            dni = elemento.find('dni').text
-            fechaIni = elemento.find('fecha_inicio').text
-            fechaFin = elemento.find('fecha_final').text
-            kmIni = elemento.find('kilometros_inicio').text
-            kmFin = elemento.find('kilometros_final').text
-            precio = elemento.find('precio_final').text
-            rec = elemento.find('recargo').text
-            est = elemento.find('estado').text
 
-            print(f'''****Alquiler****
-Id: {idAlquiler}
-Id Vehiculo: {idVehiculo}
-DNI Cliente: {dni}
-Fecha Inicio: {fechaIni}
-Fecha Finalizacion: {fechaFin}
-Kilometros Inicio: {kmIni}
-Kilometros Finalizacion: {kmFin}
-Precio Final: {precio}        
-Recargo: {rec}
-Estado: {est}
-***********************''')
+        if not root.findall('alquiler'):
+            print("No hay alquileres guardados")
+        else:
+            print("========== LISTADO ALQUILERES ==========")
+            for elemento in root.iter('alquiler'):
+                idAlquiler = elemento.get('id')
+                idVehiculo = elemento.find('id_vehiculo').text
+                dni = elemento.find('dni').text
+                fechaIni = elemento.find('fecha_inicio').text
+                fechaFin = elemento.find('fecha_final').text
+                kmIni = elemento.find('kilometros_inicio').text
+                kmFin = elemento.find('kilometros_final').text
+                precio = elemento.find('precio_final').text
+                rec = elemento.find('recargo').text
+                est = elemento.find('estado').text
+
+                print(f'''****Alquiler****
+                    Id: {idAlquiler}
+                    Id Vehiculo: {idVehiculo}
+                    DNI Cliente: {dni}
+                    Fecha Inicio: {fechaIni}
+                    Fecha Finalizacion: {fechaFin}
+                    Kilometros Inicio: {kmIni}
+                    Kilometros Finalizacion: {kmFin}
+                    Precio Final: {precio}        
+                    Recargo: {rec}
+                    Estado: {est}
+                    ***********************''')
     else:
         print("No hay alquileres aun")
 
@@ -231,7 +248,7 @@ def precioFin(fechaIni, fechaFin, idVe):
     return tarifa * dias
 
 
-def cochesDisp():
+def listado_coches_disponibles():
     tree = ET.parse('vehiculos.xml')
     root = tree.getroot()
     dicVeh = {}
@@ -246,6 +263,16 @@ def cochesDisp():
 
     return dicVeh
 
+def diponibles():
+    tree = ET.parse('vehiculos.xml')
+    root = tree.getroot()
+
+    for elemento in root.iter('vehiculo'):
+        estado = elemento.find('estado').text
+        if (estado == 'disponible'):
+            return True
+
+    return False
 
 def alquiDisp(dniRec):
     if (Path('alquileres.xml').exists()):
