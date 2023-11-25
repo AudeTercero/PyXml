@@ -1,5 +1,8 @@
+from pathlib import Path
+
 import VerificationExceptions
 import GestionXML
+
 
 
 def iniAlquiler():
@@ -13,7 +16,7 @@ def iniAlquiler():
     while (intentos < 3 and salir is False):
         try:
             idCoche = cochesDisp()
-            if(idCoche != -1):
+            if (idCoche != -1):
                 if (dni is None):
                     aux = input('Introduce el dni del cliente:\n')
                     VerificationExceptions.dniFormat(aux)
@@ -46,20 +49,21 @@ def iniAlquiler():
     else:
         print("Se han superado el maximo de errores.")
 
+
 def cochesDisp():
     dicCoches = GestionXML.cochesDisp()
     opcCorrect = False
     cont = 0
-    while(opcCorrect is False and cont < 3):
+    while (opcCorrect is False and cont < 3):
         for clave, contenido in dicCoches.items():
             print(f'Id: {clave}')
             print(contenido)
             print('++++++++++++++++++++++++++++++')
         opc = input("Seleccion la id del vehiculo que quieres alquilar:")
         for clave in dicCoches.keys():
-            if(clave == opc):
+            if (clave == opc):
                 opcCorrect = True
-        if(opcCorrect == True):
+        if (opcCorrect == True):
             return opc
         else:
             print('Esa id no esta en la lista')
@@ -73,16 +77,16 @@ def finAlquiler():
     idAlq = None
     intentos = 0
     opcCorrect = False
-    while(intentos < 3 and opcCorrect is False):
+    while (intentos < 3 and opcCorrect is False):
         try:
             idAlq = alquilerDni()
-            if(idAlq != -1):
-                if(fechaDevo is None):
+            if (idAlq != -1):
+                if (fechaDevo is None):
                     aux = input('Introduce la fecha de la devolucion del vehiculo(yyyy-mm-dd):\n')
                     VerificationExceptions.formatoFecha(aux)
                     fechaDevo = aux
                     intentos = 0
-                if(kmFin is None):
+                if (kmFin is None):
                     aux = input('Introduce el kilometraje final:\n')
                     VerificationExceptions.esNum(aux)
                     kmFin = aux
@@ -93,32 +97,33 @@ def finAlquiler():
         except VerificationExceptions.MisExceptions as err:
             intentos += 1
             print(err)
-    if(intentos < 3):
-        GestionXML.finAlquiler(fechaDevo,kmFin,idAlq)
+    if (intentos < 3):
+        GestionXML.finAlquiler(fechaDevo, kmFin, idAlq)
+
 
 # pide un dni para buscarlo en el fichero xml
 def alquilerDni():
-    dicCoches = GestionXML.cochesDisp()
+    dicCoches = {}
     opcCorrect = False
     cont = 0
     dni = None
-    while(opcCorrect is False and cont < 3):
-
+    while (opcCorrect is False and cont < 3):
         try:
-            if(dni is None):
+            if (dni is None):
                 aux = input('Introduce el dni del cliente:')
                 VerificationExceptions.dniFormat(aux)
                 dni = aux
                 cont = 0
+                dicCoches = GestionXML.alquiDisp(dni)
             for clave, contenido in dicCoches.items():
                 print(f'Id: {clave}')
                 print(contenido)
                 print('++++++++++++++++++++++++++++++')
             opc = input("Seleccion la id del vehiculo que quieres alquilar:")
             for clave in dicCoches.keys():
-                if(clave == opc):
+                if (clave == opc):
                     opcCorrect = True
-            if(opcCorrect == True):
+            if (opcCorrect == True):
                 return opc
             else:
                 print('Esa id no esta en la lista')
@@ -127,7 +132,6 @@ def alquilerDni():
             cont += 1
             print(err)
     return -1
-
 
 
 def modificar():
@@ -156,25 +160,26 @@ def mostrarTodos():
 
 
 def menu():
-    salir = True
-    while (salir):
-        opc = input(
-            "\t****GESTION ALQUILER****\n 1. Alquilar Vehiculo\n 2. Finalizar Alquiler\n 3. Modificar\n 4. Buscar por matricula \n 5. Buscar por dni del cliente\n 6. Mostrar alquileres \n  0. Salir\n ")
+    if (Path('vehiculos.xml').exists()):
+        salir = True
+        while (salir):
+            opc = input(
+                "\t****GESTION ALQUILER****\n 1. Alquilar Vehiculo\n 2. Finalizar Alquiler\n 3. Modificar\n 4. Buscar por matricula \n 5. Buscar por dni del cliente\n 6. Mostrar alquileres \n  0. Salir\n ")
 
-        if opc == "1":
-            iniAlquiler()
-        elif opc == "2":
-            finAlquiler()
-        elif opc == "3":
-            modificar()
-        elif opc == "4":
-            buscarMatricula()
-        elif opc == "5":
-            buscarDni()
-        elif opc == "6":
-            mostrarTodos()
-        elif opc == "0":
-            print("Saliendo...")
-            salir = False
-        else:
-            print("Esa opcion no existe")
+            if opc == "1":
+                iniAlquiler()
+            elif opc == "2":
+                finAlquiler()
+            elif opc == "3":
+                modificar()
+            elif opc == "4":
+                buscarMatricula()
+            elif opc == "5":
+                buscarDni()
+            elif opc == "6":
+                mostrarTodos()
+            elif opc == "0":
+                print("Saliendo...")
+                salir = False
+            else:
+                print("Esa opcion no existe")
