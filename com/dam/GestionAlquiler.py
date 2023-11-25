@@ -1,6 +1,4 @@
 from pathlib import Path
-import xml.etree.ElementTree as ET
-from xml.etree.ElementTree import Element, SubElement, Comment, ElementTree
 import VerificationExceptions
 import GestionXML
 
@@ -67,9 +65,7 @@ def cochesDisp():
             return opc
         else:
             print('Esa id no esta en la lista')
-
     return -1
-
 
 def finAlquiler():
     fechaDevo = None
@@ -101,7 +97,7 @@ def finAlquiler():
         GestionXML.finAlquiler(fechaDevo, kmFin, idAlq)
 
 
-# pide un dni para buscarlo en el fichero xml
+# pide un dni para buscarlo en el fichero xml y muestra todos los que hay para elegir uno
 def alquilerDni():
     dicCoches = {}
     opcCorrect = False
