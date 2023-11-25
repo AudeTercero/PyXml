@@ -51,7 +51,7 @@ def iniAlquiler():
 
 
 def cochesDisp():
-    dicCoches = GestionXML.cochesDisp()
+    dicCoches = GestionXML.listado_coches_disponibles()
     opcCorrect = False
     cont = 0
     while (opcCorrect is False and cont < 3):
@@ -111,7 +111,7 @@ def alquilerDni():
         try:
             if (dni is None):
                 aux = input('Introduce el dni del cliente o 0 para salir:')
-                if(aux != '0'):
+                if (aux != '0'):
                     VerificationExceptions.dniFormat(aux)
                     dni = aux
                     cont = 0
@@ -155,9 +155,9 @@ def modificar():
             0.Salir
             ''')
             if opc == "1":
-                modificador_ids('id', idAlq, 'alquileres.xml')
+                modificador_ids('id', idAlq, 'alquileres.xml', 'alquiler')
             elif opc == "2":
-                modificador_ids('id_vehiculo', idAlq, 'vehiculos.xml')
+                modificador_ids('id_vehiculo', idAlq, 'alquileres.xml', 'alquiler')
             elif opc == "3":
                 fallos = 0
                 dni = None
@@ -170,13 +170,13 @@ def modificar():
                         print(err)
                         fallos += 1
                 if (fallos < 3):
-                    GestionXML.modificar_etiqueta('dni', id_alquiler, dni)
+                    GestionXML.modificar_etiqueta('alquileres.xml', 'alquiler', 'dni', idAlq, dni)
                 else:
                     print("No puedes fallar mas de 3 veces")
             elif opc == "4":
-                modificador_fechas('fecha_inicio', id_alquiler)
+                modificador_fechas('fecha_inicio', idAlq)
             elif opc == "5":
-                modificador_fechas('fecha_final', id_alquiler)
+                modificador_fechas('fecha_final', idAlq)
             elif opc == "6":
                 fallos = 0
                 km = None
@@ -189,7 +189,7 @@ def modificar():
                         print(err)
                         fallos += 1
                 if (fallos < 3):
-                    GestionXML.modificar_etiqueta('kilometros_inicio', idAlq, km)
+                    GestionXML.modificar_etiqueta('alquileres.xml', 'alquiler', 'kilometros_inicio', idAlq, km)
                 else:
                     print("No puedes fallar mas de 3 veces")
             elif opc == "0":
@@ -202,23 +202,24 @@ def modificar():
             salir = True
 
 
-def modificador_ids(etiqueta, id_alquiler, fichero):
+def modificador_ids(etiqueta, id_alquiler, fichero, iterador):
     fallos = 0
     id_nueva = None
     while (fallos < 3 and id_nueva is None):
         try:
             aux = input(f'Escriba la nueva {etiqueta}:')
             VerificationExceptions.esNum(aux)
-            if (GestionXML.existe_id(fichero, aux, etiqueta) is False):
+            if (GestionXML.existe_id('vehiculos.xml', aux, 'vehiculo') is False):
                 id_nueva = aux
             else:
+                print("No hay ningun vehiculo con esa id")
                 fallos += 1
 
         except VerificationExceptions.MisExceptions as err:
             print(err)
             fallos += 1
     if (fallos < 3):
-        GestionXML.modificar_etiqueta('alquileres.xml','alquiler',etiqueta, id_alquiler, id_nueva)
+        GestionXML.modificar_atributo(fichero, iterador, id_alquiler, id_nueva)
     else:
         print("No puedes fallar mas de 3 veces")
 
@@ -235,20 +236,97 @@ def modificador_fechas(etiqueta, id_alquiler):
             print(err)
             fallos += 1
     if (fallos < 3):
-        GestionXML.modificar_etiqueta(etiqueta, id_alquiler, fecha)
+        GestionXML.modificar_etiqueta('alquileres.xml', 'alquiler', etiqueta, id_alquiler, fecha)
     else:
         print("No puedes fallar mas de 3 veces")
 
 
-
-
-
 def buscarMatricula():
-    print()
+    fallos = 0
+    salir = False
+    id_veh = None
+    while (fallos < 3 and salir is False):
+        matricula = input("Introduzca la matricula del vehiculo o pulse 0 para salir:")
+        if (matricula != '0'):
+            try:
+                VerificationExceptions.matFormat(matricula)
+                id_veh = GestionXML.obtIdVe(matricula)
+                if (int(id_veh) == -1):
+                    fallos += 1
+                    print("Esa matricula no existe")
+                else:
+                    salir = True
+
+            except VerificationExceptions.MisExceptions as err:
+                print(err)
+                fallos += 1
+        else:
+            salir = True
+    if (fallos < 3 and salir is True):
+        mostrar_por_elemento('id_vehiculo', id_veh)
+    elif (fallos == 3):
+        print("Se han cometido mas de 3 fallos")
+    else:
+        print("Saliendo...")
+
+
+# Este metodo va en GestionXMl y hay que modificar la linea 277 de la funcion obtIdVe(matVe) y ponerle .text
+def mostrar_por_elemento(etiqueta, abuscar):
+    tree = ET.parse('alquileres.xml')
+    root = tree.getroot()
+    existencias = False
+    for elemento in root.iter('alquiler'):
+        idAlquiler = elemento.get('id')
+        idVehiculo = elemento.find('id_vehiculo').text
+        dni = elemento.find('dni').text
+        fechaIni = elemento.find('fecha_inicio').text
+        fechaFin = elemento.find('fecha_final').text
+        kmIni = elemento.find('kilometros_inicio').text
+        kmFin = elemento.find('kilometros_final').text
+        precio = elemento.find('precio_final').text
+        rec = elemento.find('recargo').text
+        est = elemento.find('estado').text
+        aux = elemento.find(etiqueta).text
+        if (aux == abuscar):
+            existencias = True
+            print(f'''****Alquiler****
+            Id: {idAlquiler}
+            Id Vehiculo: {idVehiculo}
+            DNI Cliente: {dni}
+            Fecha Inicio: {fechaIni}
+            Fecha Finalizacion: {fechaFin}
+            Kilometros Inicio: {kmIni}
+            Kilometros Finalizacion: {kmFin}
+            Precio Final: {precio}        
+            Recargo: {rec}
+            Estado: {est}
+            ***********************''')
+    if (existencias is False):
+        print(f"No hay alquileres con {etiqueta} = {abuscar}")
 
 
 def buscarDni():
-    print()
+    dni = None
+    fallos = 0
+    salir = False
+    while (fallos < 3 and salir is False):
+        dni = input("Introduzca el dni del cliente o pulse 0 para salir:")
+        if (dni != '0' and salir is False):
+            try:
+                VerificationExceptions.dniFormat(dni)
+                salir = True
+            except VerificationExceptions.MisExceptions as err:
+                print(err)
+                fallos += 1
+        else:
+            salir = True
+    if (fallos < 3 and salir is True):
+        mostrar_por_elemento('dni', dni)
+
+    elif (fallos == 3):
+        print("Se han cometido mas de 3 fallos")
+    else:
+        print("Saliendo...")
 
 
 def mostrarTodos():
