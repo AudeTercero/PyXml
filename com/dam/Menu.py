@@ -1,6 +1,5 @@
 import GestionVehiculos
 import GestionAlquiler
-import GestionXML
 
 print("=================================")
 salir = True
