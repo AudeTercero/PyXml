@@ -467,3 +467,12 @@ def existe_id(fichero, id, etiquieta):
         if (id == id_aux):
             return True
     return False
+def modificar_atributo(fichero, iterable, id_alquiler, textoCambio):
+    tree = ET.parse(fichero)
+    root = tree.getroot()
+    for elemento in root.iter(iterable):
+        id = elemento.get('id')
+        if (id == id_alquiler):
+            elemento.set("id",textoCambio)
+
+    tree.write(fichero)

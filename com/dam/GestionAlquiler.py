@@ -110,24 +110,28 @@ def alquilerDni():
     while (opcCorrect is False and cont < 3):
         try:
             if (dni is None):
-                aux = input('Introduce el dni del cliente:')
-                VerificationExceptions.dniFormat(aux)
-                dni = aux
-                cont = 0
-                dicCoches = GestionXML.alquiDisp(dni)
-            for clave, contenido in dicCoches.items():
-                print(f'Id: {clave}')
-                print(contenido)
-                print('++++++++++++++++++++++++++++++')
-            opc = input("Seleccion la id del vehiculo que quieres alquilar:")
-            for clave in dicCoches.keys():
-                if (clave == opc):
+                aux = input('Introduce el dni del cliente o 0 para salir:')
+                if(aux != '0'):
+                    VerificationExceptions.dniFormat(aux)
+                    dni = aux
+                    cont = 0
+                    dicCoches = GestionXML.alquiDisp(dni)
+                    for clave, contenido in dicCoches.items():
+                        print(f'Id: {clave}')
+                        print(contenido)
+                        print('++++++++++++++++++++++++++++++')
+                    opc = input("Seleccion la id del vehiculo que quieres alquilar:")
+                    for clave in dicCoches.keys():
+                        if (clave == opc):
+                            opcCorrect = True
+                    if (opcCorrect == True):
+                        return opc
+                    else:
+                        print('Esa id no esta en la lista')
+                        cont += 1
+                else:
+                    print('Saliendo...')
                     opcCorrect = True
-            if (opcCorrect == True):
-                return opc
-            else:
-                print('Esa id no esta en la lista')
-                cont += 1
         except VerificationExceptions as err:
             cont += 1
             print(err)
@@ -136,7 +140,7 @@ def alquilerDni():
 
 def modificar():
     salir = False
-    id_alquiler = None
+
     while (salir is False):
         idAlq = alquilerDni()
         if (idAlq != -1):
@@ -151,9 +155,9 @@ def modificar():
             0.Salir
             ''')
             if opc == "1":
-                modificador_ids('id', id_alquiler, 'alquileres.xml')
+                modificador_ids('id', idAlq, 'alquileres.xml')
             elif opc == "2":
-                modificador_ids('id_vehiculo', id_alquiler, 'vehiculos.xml')
+                modificador_ids('id_vehiculo', idAlq, 'vehiculos.xml')
             elif opc == "3":
                 fallos = 0
                 dni = None
@@ -185,7 +189,7 @@ def modificar():
                         print(err)
                         fallos += 1
                 if (fallos < 3):
-                    GestionXML.modificar_etiqueta('kilometros_inicio', id_alquiler, km)
+                    GestionXML.modificar_etiqueta('kilometros_inicio', idAlq, km)
                 else:
                     print("No puedes fallar mas de 3 veces")
             elif opc == "0":
@@ -200,13 +204,13 @@ def modificar():
 
 def modificador_ids(etiqueta, id_alquiler, fichero):
     fallos = 0
-    id = None
-    while (fallos < 3 and id is None):
+    id_nueva = None
+    while (fallos < 3 and id_nueva is None):
         try:
             aux = input(f'Escriba la nueva {etiqueta}:')
             VerificationExceptions.esNum(aux)
-            if (GestionXML.existe_id(fichero, aux, etiqueta) is True):
-                id = aux
+            if (GestionXML.existe_id(fichero, aux, etiqueta) is False):
+                id_nueva = aux
             else:
                 fallos += 1
 
@@ -214,7 +218,7 @@ def modificador_ids(etiqueta, id_alquiler, fichero):
             print(err)
             fallos += 1
     if (fallos < 3):
-        GestionXML.modificar_etiqueta(etiqueta, id_alquiler, id)
+        GestionXML.modificar_etiqueta('alquileres.xml','alquiler',etiqueta, id_alquiler, id_nueva)
     else:
         print("No puedes fallar mas de 3 veces")
 
