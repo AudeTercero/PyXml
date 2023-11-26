@@ -7,7 +7,7 @@ from datetime import datetime
 # ******************** FUNCIONES  VEHICULOS **************************************
 # Funcion para ver si existe la matricula
 def existe_matricula(fichero, matricula):
-    if(Path(fichero).exists() is True):
+    if (Path(fichero).exists() is True):
         tree = ET.parse(fichero)
         root = tree.getroot()
         for elemento in root.iter('vehiculo'):
@@ -186,7 +186,8 @@ def modificar_vehiculo(matricula, xml_path):
                                            nuevaTarifa)
 
                     elif opc == "7":
-                        nuevoEstado = input("Ingrese el nuevo estado del vehículo (disponible, alquilado o mantenimiento): ")
+                        nuevoEstado = input(
+                            "Ingrese el nuevo estado del vehículo (disponible, alquilado o mantenimiento): ")
                         modificar_etiqueta(xml_path, "vehiculo", "estado", vehiculo.find("estado").text, nuevoEstado)
 
                     elif opc == "0":
@@ -279,7 +280,7 @@ def crearAlquiler(dni, fechaIni, fechaFin, kmIni, idVe):
     tree2 = ET.parse('vehiculos.xml')
     root2 = tree2.getroot()
     for elemento in root2.iter('vehiculo'):
-        if(elemento.get('id') == idVe):
+        if (elemento.get('id') == idVe):
             elemento.find('estado').text = 'alquilado'
     tree2.write('vehiculos.xml')
 
@@ -392,6 +393,10 @@ def listado_coches_disponibles():
 
 
 def diponibles():
+    """
+    Funcion que comprueba si hay vehiculos disponibles
+    :return: Retorna True si encuentra alguno disponibles y False en caso contrario
+    """
     tree = ET.parse('vehiculos.xml')
     root = tree.getroot()
 
@@ -413,9 +418,22 @@ def alquiDisp(dniRec):
             idVeh = elemento.find('id_vehiculo').text
             dni = elemento.find('dni').text
             fechaIni = elemento.find('fecha_inicio').text
-            if (dni == dniRec):
+            if (dni == dniRec and elemento.find('esetado') == 'Activo'):
                 dicAlq[idAlq] = {'Id_Vehiculo': idVeh, 'Dni': dni, 'Fecha_Inicio': fechaIni}
         return dicAlq
+
+def alquileres_activos():
+    """
+    Funcion que comprueba si hay alquileres Activos
+    :return: Retorna True si encuentra alguno activo y False en caso contrario
+    """
+    if (Path('alquileres.xml').exists()):
+        tree = ET.parse('alquileres.xml')
+        root = tree.getroot()
+        for elemento in root.iter('alquiler'):
+            if (elemento.find('esetado') == 'Activo'):
+                return True
+        return False
 
 
 # Este metodo va en GestionXMl y hay que modificar la linea 277 de la funcion obtIdVe(matVe) y ponerle .text
@@ -525,6 +543,13 @@ def modificar_etiqueta(fichero, iterable, etiqueta, id_elemento, texto_cambio):
 
 # Funcion para ver si existe la id
 def existe_id(fichero, id, etiquieta):
+    """
+    Funcion que comprueba si existe una id
+    :param fichero: Recibe el nombre del fichero
+    :param id: Recibe el id
+    :param etiquieta: Recibe la etiqueta a iterar
+    :return: Retorna True si existe False en caso de que no
+    """
     tree = ET.parse(fichero)
     root = tree.getroot()
     for elemento in root.iter(etiquieta):
@@ -535,6 +560,14 @@ def existe_id(fichero, id, etiquieta):
 
 
 def modificar_atributo(fichero, iterable, id_elemento, textoCambio):
+    """
+    Funcion para modificar un atributo que en este caso serian las ids
+    :param fichero: Recibe el nombre del fichero
+    :param iterable: Recibe el elemento a iterar
+    :param id_elemento: Recibe el id
+    :param textoCambio: Recibe el texto del elemento que queremos cambiar que en este caso son las ids
+    :return:
+    """
     salir = False
     tree = ET.parse(fichero)
     root = tree.getroot()
@@ -556,3 +589,20 @@ def modificar_atributo(fichero, iterable, id_elemento, textoCambio):
             print("Saliendo sin guardar...")
         else:
             print("Entrada no valida.")
+
+
+def obt_elemento(fichero, id, iterador, etiqueta):
+    """
+    Funcion para obtener el texto de un elemento del fichero
+    :param fichero: Recibe el fichero donde debe buscar
+    :param id: Recibe la id del elemento que queremos
+    :param iterador: Recibe la etiqueta que vamos a iterar
+    :param etiqueta: Recibe la etiqueta del elemento que queremos
+    :return: Retorna el texto del elemento si lo encuentra en caso contrario retorna None
+    """
+    tree = ET.parse(fichero)
+    root = tree.getroot()
+    for elemento in root.iter(iterador):
+        if (elemento.get('id') == id):
+            return elemento.find(etiqueta).text
+    return None

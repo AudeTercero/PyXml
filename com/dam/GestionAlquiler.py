@@ -4,17 +4,20 @@ import GestionXML
 
 
 def iniAlquiler():
+    """
+    Funcion para dar de alta un alquiler con los datos para ello
+    :return:
+    """
     dni = None
     fechaIni = None
     fechaFin = None
     kmIni = None
-    idCoche = None
     intentos = 0
     salir = False
-    while (intentos < 3 and salir is False):
-        try:
-            idCoche = cochesDisp()
-            if (idCoche != -1):
+    idCoche = cochesDisp()
+    if (idCoche != -1):
+        while (intentos < 3 and salir is False):
+            try:
                 if (dni is None):
                     aux = input('Introduce el dni del cliente:\n')
                     VerificationExceptions.dniFormat(aux)
@@ -28,6 +31,7 @@ def iniAlquiler():
                 if (fechaFin is None):
                     aux = input('Introduce la fecha final del alquiler(yyyy-mm-dd):\n')
                     VerificationExceptions.formatoFecha(aux)
+                    VerificationExceptions.dife_fechas(fechaIni, aux)
                     fechaFin = aux
                     intentos = 0
                 if (kmIni is None):
@@ -36,11 +40,11 @@ def iniAlquiler():
                     kmIni = aux
                     intentos = 0
                     salir = True
-            else:
-                intentos = 3
-        except VerificationExceptions.MisExceptions as err:
-            intentos += 1
-            print(err)
+            except VerificationExceptions.MisExceptions as err:
+                intentos += 1
+                print(err)
+    else:
+        intentos = 3
     if (intentos < 3):
         GestionXML.crearAlquiler(dni, fechaIni, fechaFin, kmIni, idCoche)
         print("Guardado correctamente")
@@ -49,6 +53,10 @@ def iniAlquiler():
 
 
 def cochesDisp():
+    """
+    Funcion que muestra un listado de vehiculos disponibles para que elijas uno
+    :return: Retorna la id del vehiculo seleccionado o -1 en caso de que se falle
+    """
     dicCoches = GestionXML.listado_coches_disponibles()
     opcCorrect = False
     cont = 0
@@ -67,7 +75,12 @@ def cochesDisp():
             print('Esa id no esta en la lista')
     return -1
 
+
 def finAlquiler():
+    """
+    Funcion para finalizar un alquiler introduciendo los datos de finalizacion del alquiler
+    :return:
+    """
     fechaDevo = None
     kmFin = None
     idAlq = None
@@ -80,6 +93,8 @@ def finAlquiler():
                 if (fechaDevo is None):
                     aux = input('Introduce la fecha de la devolucion del vehiculo(yyyy-mm-dd):\n')
                     VerificationExceptions.formatoFecha(aux)
+                    fecha_ini = GestionXML.obt_elemento("alquileres.xml", idAlq, 'alquiler', 'fecha_inicio')
+                    VerificationExceptions.dife_fechas(fecha_ini, aux)
                     fechaDevo = aux
                     intentos = 0
                 if (kmFin is None):
@@ -99,7 +114,10 @@ def finAlquiler():
 
 # pide un dni para buscarlo en el fichero xml y muestra todos los que hay para elegir uno
 def alquilerDni():
-    dic_alqui = {}
+    """
+    Funcion que pide un dni para buscarlo en el fichero xml y muestra todos los que hay para elegir uno
+    :return: Retorna la id del alquiler seleccionado o -1 en caso de que se falle
+    """
     opcCorrect = False
     cont = 0
     dni = None
@@ -112,30 +130,39 @@ def alquilerDni():
                     dni = aux
                     cont = 0
                     dic_alqui = GestionXML.alquiDisp(dni)
-                    for clave, contenido in dic_alqui.items():
-                        print(f'Id: {clave}')
-                        print(contenido.get('Id_Vehiculo'))
-                        print('++++++++++++++++++++++++++++++')
-                    opc = input("Seleccion la id del alquiler:")
-                    for clave in dic_alqui.keys():
-                        if (clave == opc):
-                            opcCorrect = True
-                    if (opcCorrect == True):
-                        return opc
-                    else:
-                        print('Esa id no esta en la lista')
+                    if(not dic_alqui):
+                        print('No hay alquileres activos para ese dni')
                         dni = None
                         cont += 1
+                    else:
+                        for clave, contenido in dic_alqui.items():
+                            print(f'Id: {clave}')
+                            print(contenido.get('Id_Vehiculo'))
+                            print('++++++++++++++++++++++++++++++')
+                        opc = input("Seleccion la id del alquiler:")
+                        for clave in dic_alqui.keys():
+                            if (clave == opc):
+                                opcCorrect = True
+                        if (opcCorrect == True):
+                            return opc
+                        else:
+                            print('Esa id no esta en la lista')
+                            dni = None
+                            cont += 1
                 else:
                     print('Saliendo...')
                     opcCorrect = True
-        except VerificationExceptions as err:
+        except VerificationExceptions.MisExceptions as err:
             cont += 1
             print(err)
     return -1
 
 
 def modificar():
+    """
+    Funcion para modificar los textos de los elementos del fichero de alquileres
+    :return:
+    """
     salir = False
     idAlq = alquilerDni()
     if (idAlq != -1):
@@ -187,7 +214,7 @@ def modificar():
                         print(err)
                         fallos += 1
                 if (fallos < 3):
-                    GestionXML.modificar_etiqueta('alquileres.xml', 'alquiler','id_vehiculo', idAlq, id_nueva)
+                    GestionXML.modificar_etiqueta('alquileres.xml', 'alquiler', 'id_vehiculo', idAlq, id_nueva)
                 else:
                     print("No puedes fallar mas de 3 veces")
             elif opc == "3":
@@ -287,6 +314,8 @@ def buscarMatricula():
         print("Se han cometido mas de 3 fallos")
     else:
         print("Saliendo...")
+
+
 def buscarDni():
     """
     Funcion para buscar los alquileres realizados con ese dni
@@ -339,15 +368,33 @@ def menu():
                 else:
                     print("No hay coches disponibles")
             elif opc == "2":
-                finAlquiler()
+                if(Path('alquileres.xml').exists() and GestionXML.alquileres_activos() is True):
+                    finAlquiler()
+                else:
+                    print("No hay alquileres activos")
             elif opc == "3":
-                modificar()
+                if (Path('alquileres.xml').exists() and GestionXML.alquileres_activos() is True):
+                    modificar()
+                else:
+                    print("No hay alquileres activos. Solo se pueden modificar los alquileres que estan activos")
+
             elif opc == "4":
-                buscarMatricula()
+                if(Path('alquileres.xml').exists()):
+                    buscarMatricula()
+                else:
+                    print("No hay alquileres aun guardados")
             elif opc == "5":
-                buscarDni()
+                if (Path('alquileres.xml').exists()):
+                    buscarDni()
+                else:
+                    print("No hay alquileres aun guardados")
+
             elif opc == "6":
-                mostrarTodos()
+                if (Path('alquileres.xml').exists()):
+                    mostrarTodos()
+                else:
+                    print("No hay alquileres aun guardados")
+
             elif opc == "0":
                 print("Saliendo...")
                 salir = False
