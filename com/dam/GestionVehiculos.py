@@ -111,7 +111,7 @@ def alta():
     salir = False
     while not salir and not salir_sin_guardar:
         cont = 0
-        estado = input("Ingrese el estado del vehiculo: ")
+        estado = input("Ingrese el estado del vehiculo (disponible, alquilado o mantenimiento): ")
         if (estado == "0"):
             salir_sin_guardar = True
             salir = True
@@ -120,7 +120,7 @@ def alta():
                 if cont == 3:
                     salir_sin_guardar = True
                 else:
-                    VerificationExceptions.hayAlgo(estado)
+                    VerificationExceptions.disp_correcto(estado)
 
                     salir = True
 

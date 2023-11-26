@@ -99,7 +99,7 @@ def finAlquiler():
 
 # pide un dni para buscarlo en el fichero xml y muestra todos los que hay para elegir uno
 def alquilerDni():
-    dicCoches = {}
+    dic_alqui = {}
     opcCorrect = False
     cont = 0
     dni = None
@@ -111,19 +111,20 @@ def alquilerDni():
                     VerificationExceptions.dniFormat(aux)
                     dni = aux
                     cont = 0
-                    dicCoches = GestionXML.alquiDisp(dni)
-                    for clave, contenido in dicCoches.items():
+                    dic_alqui = GestionXML.alquiDisp(dni)
+                    for clave, contenido in dic_alqui.items():
                         print(f'Id: {clave}')
-                        print(contenido)
+                        print(contenido.get('Id_Vehiculo'))
                         print('++++++++++++++++++++++++++++++')
-                    opc = input("Seleccion la id del vehiculo que quieres alquilar:")
-                    for clave in dicCoches.keys():
+                    opc = input("Seleccion la id del alquiler:")
+                    for clave in dic_alqui.keys():
                         if (clave == opc):
                             opcCorrect = True
                     if (opcCorrect == True):
                         return opc
                     else:
                         print('Esa id no esta en la lista')
+                        dni = None
                         cont += 1
                 else:
                     print('Saliendo...')
@@ -136,10 +137,9 @@ def alquilerDni():
 
 def modificar():
     salir = False
-
-    while (salir is False):
-        idAlq = alquilerDni()
-        if (idAlq != -1):
+    idAlq = alquilerDni()
+    if (idAlq != -1):
+        while (salir is False):
             opc = input(''' 
             ******* MODIFICACION ALQUILER *******
             1.Id del Alquiler
@@ -151,9 +151,45 @@ def modificar():
             0.Salir
             ''')
             if opc == "1":
-                modificador_ids('id', idAlq, 'alquileres.xml', 'alquiler')
+                fallos = 0
+                id_nueva = None
+                while (fallos < 3 and id_nueva is None):
+                    try:
+                        aux = input('Escriba la nueva id:')
+                        VerificationExceptions.esNum(aux)
+                        if (GestionXML.existe_id('alquileres.xml', aux, 'alquiler') is False):
+                            id_nueva = aux
+                        else:
+                            print("Ya existe un alquiler con esa id")
+                            fallos += 1
+
+                    except VerificationExceptions.MisExceptions as err:
+                        print(err)
+                        fallos += 1
+                if (fallos < 3):
+                    GestionXML.modificar_atributo('alquileres.xml', 'alquiler', idAlq, id_nueva)
+                else:
+                    print("No puedes fallar mas de 3 veces")
             elif opc == "2":
-                modificador_ids('id_vehiculo', idAlq, 'alquileres.xml', 'alquiler')
+                fallos = 0
+                id_nueva = None
+                while (fallos < 3 and id_nueva is None):
+                    try:
+                        aux = input(f'Escriba la nueva id_vehiculo:')
+                        VerificationExceptions.esNum(aux)
+                        if (GestionXML.existe_id('vehiculos.xml', aux, 'vehiculo') is True):
+                            id_nueva = aux
+                        else:
+                            print("Ya existe un vehiculo con esa id")
+                            fallos += 1
+
+                    except VerificationExceptions.MisExceptions as err:
+                        print(err)
+                        fallos += 1
+                if (fallos < 3):
+                    GestionXML.modificar_etiqueta('alquileres.xml', 'alquiler','id_vehiculo', idAlq, id_nueva)
+                else:
+                    print("No puedes fallar mas de 3 veces")
             elif opc == "3":
                 fallos = 0
                 dni = None
@@ -193,34 +229,17 @@ def modificar():
                 salir = True
             else:
                 print("Esa opcion no existe")
-        else:
-            print('No puedes fallar mas de 3 veces')
-            salir = True
-
-
-def modificador_ids(etiqueta, id_alquiler, fichero, iterador):
-    fallos = 0
-    id_nueva = None
-    while (fallos < 3 and id_nueva is None):
-        try:
-            aux = input(f'Escriba la nueva {etiqueta}:')
-            VerificationExceptions.esNum(aux)
-            if (GestionXML.existe_id('vehiculos.xml', aux, 'vehiculo') is False):
-                id_nueva = aux
-            else:
-                print("No hay ningun vehiculo con esa id")
-                fallos += 1
-
-        except VerificationExceptions.MisExceptions as err:
-            print(err)
-            fallos += 1
-    if (fallos < 3):
-        GestionXML.modificar_atributo(fichero, iterador, id_alquiler, id_nueva)
     else:
-        print("No puedes fallar mas de 3 veces")
+        print('No puedes fallar mas de 3 veces')
 
 
 def modificador_fechas(etiqueta, id_alquiler):
+    """
+    Funcion para modificar fechas
+    :param etiqueta: recibe la etiqueta que sera con la que podemos identificar que querermos modificar del xml
+    :param id_alquiler:recibe la id del alquiler que estamos modificando
+    :return:
+    """
     fallos = 0
     fecha = None
     while (fallos < 3 and fecha is None):
@@ -238,6 +257,10 @@ def modificador_fechas(etiqueta, id_alquiler):
 
 
 def buscarMatricula():
+    """
+    Funcion que muestra los alquileres de un determinado vehiculo que se busca por dni
+    :return:
+    """
     fallos = 0
     salir = False
     id_veh = None
@@ -265,6 +288,10 @@ def buscarMatricula():
     else:
         print("Saliendo...")
 def buscarDni():
+    """
+    Funcion para buscar los alquileres realizados con ese dni
+    :return:
+    """
     dni = None
     fallos = 0
     salir = False
@@ -289,30 +316,42 @@ def buscarDni():
 
 
 def mostrarTodos():
+    """
+    Funcion para mostrar todos los alquileres
+    :return:
+    """
     GestionXML.mostrarTodoAlq()
 
 
 def menu():
+    """
+    Funcion para el menu de gestion de alquileres
+    :return:
+    """
     if (Path('vehiculos.xml').exists()):
-        if (GestionXML.diponibles() is True):
-            salir = True
-            while (salir):
-                opc = input(
-                    "\t****GESTION ALQUILER****\n 1. Alquilar Vehiculo\n 2. Finalizar Alquiler\n 3. Modificar\n 4. Buscar por matricula \n 5. Buscar por dni del cliente\n 6. Mostrar alquileres \n  0. Salir\n ")
-                if opc == "1":
+        salir = True
+        while (salir):
+            opc = input(
+                "\t****GESTION ALQUILER****\n 1. Alquilar Vehiculo\n 2. Finalizar Alquiler\n 3. Modificar\n 4. Buscar por matricula \n 5. Buscar por dni del cliente\n 6. Mostrar alquileres \n 0. Salir\n ")
+            if opc == "1":
+                if (GestionXML.diponibles() is True):
                     iniAlquiler()
-                elif opc == "2":
-                    finAlquiler()
-                elif opc == "3":
-                    modificar()
-                elif opc == "4":
-                    buscarMatricula()
-                elif opc == "5":
-                    buscarDni()
-                elif opc == "6":
-                    mostrarTodos()
-                elif opc == "0":
-                    print("Saliendo...")
-                    salir = False
                 else:
-                    print("Esa opcion no existe")
+                    print("No hay coches disponibles")
+            elif opc == "2":
+                finAlquiler()
+            elif opc == "3":
+                modificar()
+            elif opc == "4":
+                buscarMatricula()
+            elif opc == "5":
+                buscarDni()
+            elif opc == "6":
+                mostrarTodos()
+            elif opc == "0":
+                print("Saliendo...")
+                salir = False
+            else:
+                print("Esa opcion no existe")
+    else:
+        print("Aun no hay vehiculos guardados")

@@ -7,12 +7,13 @@ from datetime import datetime
 # ******************** FUNCIONES  VEHICULOS **************************************
 # Funcion para ver si existe la matricula
 def existe_matricula(fichero, matricula):
-    tree = ET.parse(fichero)
-    root = tree.getroot()
-    for elemento in root.iter('vehiculo'):
-        mat_aux = elemento.get('matricula')
-        if (matricula == mat_aux):
-            return True
+    if(Path(fichero).exists() is True):
+        tree = ET.parse(fichero)
+        root = tree.getroot()
+        for elemento in root.iter('vehiculo'):
+            mat_aux = elemento.get('matricula')
+            if (matricula == mat_aux):
+                return True
     return False
 
 
@@ -185,7 +186,7 @@ def modificar_vehiculo(matricula, xml_path):
                                            nuevaTarifa)
 
                     elif opc == "7":
-                        nuevoEstado = input("Ingrese el nuevo estado del vehículo: ")
+                        nuevoEstado = input("Ingrese el nuevo estado del vehículo (disponible, alquilado o mantenimiento): ")
                         modificar_etiqueta(xml_path, "vehiculo", "estado", vehiculo.find("estado").text, nuevoEstado)
 
                     elif opc == "0":
@@ -247,7 +248,7 @@ def crearAlquiler(dni, fechaIni, fechaFin, kmIni, idVe):
         root = Element('alquileres')
         tree = ET.ElementTree(root)
 
-    # Creamos el vehiculo y su atributo
+    # Creamos el alquiler y su atributo
     alquiler = ET.Element('alquiler')
     id = ET.SubElement(alquiler, 'id').text = str(obtId('alquileres.xml', "alquiler"))
     alquiler.set('id', id)
@@ -264,7 +265,7 @@ def crearAlquiler(dni, fechaIni, fechaFin, kmIni, idVe):
     ET.SubElement(alquiler, 'recargo').text = ''
     ET.SubElement(alquiler, 'estado').text = 'Activo'
 
-    # Agregamos el nuevo vehiculo
+    # Agregamos el nuevo alquiler
     root.append(alquiler)
 
     # Guardamos el archivo XML actualizado
@@ -274,6 +275,13 @@ def crearAlquiler(dni, fechaIni, fechaFin, kmIni, idVe):
     eliminarEspacios("alquileres.xml")
     file.close()
     eliminarEspacios('alquileres.xml')
+
+    tree2 = ET.parse('vehiculos.xml')
+    root2 = tree2.getroot()
+    for elemento in root2.iter('vehiculo'):
+        if(elemento.get('id') == idVe):
+            elemento.find('estado').text = 'alquilado'
+    tree2.write('vehiculos.xml')
 
 
 def obtIdVe(matVe):
@@ -305,11 +313,17 @@ def finAlquiler(fechaDevo, kmFin, id):
                 if (diasR > 0):
                     recargo.text = str(diasR * 80)
                 else:
-                    recargo.text = str("No hay recargo")
+                    recargo.text = 0
                 preciFin.text = str(precioFin(fechaIni, fechaFin, idVe) + int(recargo.text))
                 elemento.find('estado').text = 'Finalizado'
 
                 tree.write('alquileres.xml')
+                tree2 = ET.parse('vehiculos.xml')
+                root2 = tree2.getroot()
+                for elemento in root2.iter('vehiculo'):
+                    if (elemento.get('id') == idVe):
+                        elemento.find('estado').text = 'disponible'
+                tree2.write('vehiculos.xml')
 
 
 def mostrarTodoAlq():
@@ -479,18 +493,27 @@ def modificar_etiqueta(fichero, iterable, etiqueta, id_elemento, texto_cambio):
     salir = False
     tree = ET.parse(fichero)
     root = tree.getroot()
+    elem = None
 
     for elemento in root.iter(iterable):
         id = elemento.get('id')
         elem = elemento.find(etiqueta)
         if id == id_elemento:
-            elem.text = texto_cambio
+            elemento.find(etiqueta).text = texto_cambio
 
     while not salir:
         op = input("Quieres guardar los cambios generados?[S/N]").lower()
-
         if op == "s":
             tree.write(fichero)
+            if (fichero == 'alquileres.xml' and etiqueta == 'id_vehiculo'):
+                tree2 = ET.parse('vehiculos.xml')
+                root2 = tree2.getroot()
+                for element in root2.iter():
+                    if (element.get('id') == texto_cambio):
+                        element.find('estado').text = 'alquilado'
+                    if (element.get('id') == elem):
+                        element.find('estado').text = 'disponible'
+                tree2.write('vehiculos.xml')
             salir = True
             print("Cambios guardados, saliendo...")
         elif op == "n":
