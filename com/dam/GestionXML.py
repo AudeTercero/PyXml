@@ -17,8 +17,24 @@ def existe_matricula(fichero, matricula):
 
 
 def obtener_vehiculo(xml_path, matricula):
-    try:
-        tree = ET.parse(xml_path)
+    vehiculo_buscado = None
+
+    if Path(xml_path).exists():
+        try:
+            tree = ET.parse(xml_path)
+            root = tree.getroot()
+
+            for vehiculo in root.findall('vehiculo'):
+                mat_vehi = vehiculo.find('matricula').text
+                if (mat_vehi == matricula):
+                    vehiculo_buscado = vehiculo
+
+        except FileNotFoundError:
+            print("No hay vehiculos guardados")
+        except Exception as e:
+            print(f"Error: {e}")
+
+    return vehiculo_buscado
 
 
 # Funcion para mostrar todos los vehiculos guardados
@@ -86,41 +102,17 @@ def aniadir_vehiculo(matricula, marca, modelo, anio_fabricacion, tarifa_dia, est
 
 # Funcion para eliminar vehiculos guardados
 def eliminar_vehiculo(matricula, xml_path):
-    vehiculo_encontrado = False
     try:
         tree = ET.parse(xml_path)
         root = tree.getroot()
 
-        # Buscamos el vehiculo con la matricula indicada por el usuario
         for vehiculo in root.findall('vehiculo'):
             mat_vehi = vehiculo.find('matricula').text
+
             if (mat_vehi == matricula):
-                vehiculo_buscado = vehiculo
-
-        # Si lo encuentra, eliminamos el vehiculo
-        if vehiculo_buscado is not None:
-            vehiculo_encontrado = True
-            salir = False
-
-            # Preguntamos si desea eliminar el vehiculo, de ser asi lo borramos
-            while not salir:
-                op = input("Seguro que quieres borrar el vehiculo? [S/N]").lower()
-                if (op == "s"):
-                    root.remove(vehiculo_buscado)
-                    tree.write(xml_path)
-                    print("El vehiculo ha sido eliminado")
-                    salir = True;
-                elif (op == "n"):
-                    print("Saliendo...")
-                else:
-                    print("Opcion no valida.")
-
-        # Si no lo encuentra, lo indicamos
-        if not vehiculo_encontrado:
-            print("No se encontro el vehiculo")
-
-        else:
-            print("El vehiculo no se ha podido encontrar")
+                root.remove(vehiculo)
+                tree.write(xml_path)
+                print("El vehiculo ha sido eliminado")
 
     except FileNotFoundError:
         print("No hay vehiculos guardados")
@@ -156,7 +148,7 @@ def modificar_vehiculo(matricula, xml_path):
                             nuevo_id = input("Ingresa el nuevo ID del vehiculo")
                             if existe_id(xml_path, nuevo_id, "vehiculo") is not True:
                                 id_valido = True
-                                modificar_atributo(xml_path, "vehiculo",vehiculo.get("id"), nuevo_id)
+                                modificar_atributo(xml_path, "vehiculo", vehiculo.get("id"), nuevo_id)
                             else:
                                 print("El ID introducido ya pertenece a un vehiculo existente.")
 
@@ -167,25 +159,30 @@ def modificar_vehiculo(matricula, xml_path):
                             nueva_mat = input("Ingresa la nueva matricula del vehiculo")
                             if existe_matricula(xml_path, nueva_mat) is not True:
                                 mat_valida = True
-                                modificar_etiqueta(xml_path, "vehiculo", "matricula", vehiculo.find("matricula").text, mat_valida)
+                                modificar_etiqueta(xml_path, "vehiculo", "matricula", vehiculo.find("matricula").text,
+                                                   mat_valida)
                             else:
                                 print("La matricula introducida ya pertenece a un vehiculo existente.")
 
                     elif opc == "3":
                         nuevaMarca = input("Ingrese la nueva marca del vehículo: ")
-                        modificar_etiqueta(xml_path, "vehiculo", "descripcion/marca", vehiculo.find("descripcion/marca").text, nuevaMarca)
+                        modificar_etiqueta(xml_path, "vehiculo", "descripcion/marca",
+                                           vehiculo.find("descripcion/marca").text, nuevaMarca)
 
                     elif opc == "4":
                         nuevoModelo = input("Ingrese el nuevo modelo del vehículo: ")
-                        modificar_etiqueta(xml_path, "vehiculo", "descripcion/modelo", vehiculo.find("descripcion/modelo").text, nuevoModelo)
+                        modificar_etiqueta(xml_path, "vehiculo", "descripcion/modelo",
+                                           vehiculo.find("descripcion/modelo").text, nuevoModelo)
 
                     elif opc == "5":
                         nuevoAnio = int(input("Ingrese el nuevo año de fabricación del vehículo: "))
-                        modificar_etiqueta(xml_path, "vehiculo", "anioFabricacion", vehiculo.find("anioFabricacion").text, nuevoAnio)
+                        modificar_etiqueta(xml_path, "vehiculo", "anioFabricacion",
+                                           vehiculo.find("anioFabricacion").text, nuevoAnio)
 
                     elif opc == "6":
                         nuevaTarifa = float(input("Ingrese la nueva tarifa por día del vehículo: "))
-                        modificar_etiqueta(xml_path, "vehiculo", "tarifaDia", vehiculo.find("tarifaDia").text, nuevaTarifa)
+                        modificar_etiqueta(xml_path, "vehiculo", "tarifaDia", vehiculo.find("tarifaDia").text,
+                                           nuevaTarifa)
 
                     elif opc == "7":
                         nuevoEstado = input("Ingrese el nuevo estado del vehículo: ")
@@ -405,6 +402,8 @@ def alquiDisp(dniRec):
             if (dni == dniRec):
                 dicAlq[idAlq] = {'Id_Vehiculo': idVeh, 'Dni': dni, 'Fecha_Inicio': fechaIni}
         return dicAlq
+
+
 # Este metodo va en GestionXMl y hay que modificar la linea 277 de la funcion obtIdVe(matVe) y ponerle .text
 def mostrar_por_elemento(etiqueta, abuscar):
     tree = ET.parse('alquileres.xml')
@@ -438,6 +437,7 @@ def mostrar_por_elemento(etiqueta, abuscar):
             ***********************''')
     if (existencias is False):
         print(f"No hay alquileres con {etiqueta} = {abuscar}")
+
 
 # ******************** FUNCIONES  COMUNES **************************************
 

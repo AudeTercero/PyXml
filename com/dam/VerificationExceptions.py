@@ -45,3 +45,4 @@ def formatoFecha(fecha):
         datetime.strptime(fecha, formato)
     except ValueError:
         raise MisExceptions('Formato de la fecha incorrecto. Formato esperado yyyy-mm-dd')
+
