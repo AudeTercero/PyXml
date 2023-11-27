@@ -110,6 +110,8 @@ def finAlquiler():
             print(err)
     if (intentos < 3):
         GestionXML.finAlquiler(fechaDevo, kmFin, idAlq)
+        print("Se ha finalizado correctamente el alquiler")
+        GestionXML.mostrar_por_atributo(idAlq)
 
 
 def alquilerDni():
@@ -194,6 +196,7 @@ def modificar():
                         fallos += 1
                 if (fallos < 3):
                     GestionXML.modificar_atributo('alquileres.xml', 'alquiler', idAlq, id_nueva)
+                    print("Modificacion realizada correctamente")
                 else:
                     print("No puedes fallar mas de 3 veces")
             elif opc == "2":
@@ -214,6 +217,7 @@ def modificar():
                         fallos += 1
                 if (fallos < 3):
                     GestionXML.modificar_etiqueta('alquileres.xml', 'alquiler', 'id_vehiculo', idAlq, id_nueva)
+                    print("Modificacion realizada correctamente")
                 else:
                     print("No puedes fallar mas de 3 veces")
             elif opc == "3":
@@ -229,6 +233,7 @@ def modificar():
                         fallos += 1
                 if (fallos < 3):
                     GestionXML.modificar_etiqueta('alquileres.xml', 'alquiler', 'dni', idAlq, dni)
+                    print("Modificacion realizada correctamente")
                 else:
                     print("No puedes fallar mas de 3 veces")
             elif opc == "4":
@@ -244,6 +249,7 @@ def modificar():
                         fallos += 1
                 if (fallos < 3):
                     GestionXML.modificar_etiqueta('alquileres.xml', 'alquiler', 'fecha_inicio', idAlq, fecha)
+                    print("Modificacion realizada correctamente")
                 else:
                     print("No puedes fallar mas de 3 veces")
             elif opc == "5":
@@ -261,6 +267,7 @@ def modificar():
                         fallos += 1
                 if (fallos < 3):
                     GestionXML.modificar_etiqueta('alquileres.xml', 'alquiler', 'fecha_final', idAlq, fecha)
+                    print("Modificacion realizada correctamente")
                 else:
                     print("No puedes fallar mas de 3 veces")
             elif opc == "6":
@@ -276,6 +283,7 @@ def modificar():
                         fallos += 1
                 if (fallos < 3):
                     GestionXML.modificar_etiqueta('alquileres.xml', 'alquiler', 'kilometros_inicio', idAlq, km)
+                    print("Modificacion realizada correctamente")
                 else:
                     print("No puedes fallar mas de 3 veces")
             elif opc == "0":

@@ -344,8 +344,7 @@ def crearAlquiler(dni, fechaIni, fechaFin, kmIni, idVe):
 
     # Creamos el alquiler y su atributo
     alquiler = ET.Element('alquiler')
-    id = ET.SubElement(alquiler, 'id').text = str(obtId('alquileres.xml', "alquiler"))
-    alquiler.set('id', id)
+    alquiler.set('id', str(obtId('alquileres.xml', "alquiler")))
 
     # Creamos sus atributos o subelementos
     ET.SubElement(alquiler, 'id_vehiculo').text = idVe
@@ -481,6 +480,7 @@ def precioFin(fechaIni, fechaFin, idVe):
     :param idVe: Recibe la id del Vehiculo
     :return: Retorna la el precio final y calculado
     """
+    tarifa = 0
     tree = ET.parse('vehiculos.xml')
     root = tree.getroot()
     for elemento in root.iter('vehiculo'):
@@ -587,6 +587,43 @@ def mostrar_por_elemento(etiqueta, abuscar):
         if (aux == abuscar):
             existencias = True
             print(f'''****Alquiler****
+Id: {idAlquiler}
+Id Vehiculo: {idVehiculo}
+DNI Cliente: {dni}
+Fecha Inicio: {fechaIni}
+Fecha Finalizacion: {fechaFin}
+Kilometros Inicio: {kmIni}
+Kilometros Finalizacion: {kmFin}
+Precio Final: {precio}        
+Recargo: {rec}
+Estado: {est}
+***********************''')
+    if (existencias is False):
+        print(f"No hay alquileres con {etiqueta} = {abuscar}")
+
+
+def mostrar_por_atributo(abuscar):
+    """
+    Funcion que muestra un alquiler dependiendo de los paramatros que recibe
+    :param abuscar: Recibe el texto a buscar
+    :return:
+    """
+    tree = ET.parse('alquileres.xml')
+    root = tree.getroot()
+    for elemento in root.iter('alquiler'):
+        idAlquiler = elemento.get('id')
+        idVehiculo = elemento.find('id_vehiculo').text
+        dni = elemento.find('dni').text
+        fechaIni = elemento.find('fecha_inicio').text
+        fechaFin = elemento.find('fecha_final').text
+        kmIni = elemento.find('kilometros_inicio').text
+        kmFin = elemento.find('kilometros_final').text
+        precio = elemento.find('precio_final').text
+        rec = elemento.find('recargo').text
+        est = elemento.find('estado').text
+        aux = elemento.get('id')
+        if (aux == abuscar):
+            print(f'''****Alquiler****
             Id: {idAlquiler}
             Id Vehiculo: {idVehiculo}
             DNI Cliente: {dni}
@@ -598,8 +635,6 @@ def mostrar_por_elemento(etiqueta, abuscar):
             Recargo: {rec}
             Estado: {est}
             ***********************''')
-    if (existencias is False):
-        print(f"No hay alquileres con {etiqueta} = {abuscar}")
 
 
 # ******************** FUNCIONES  COMUNES **************************************
