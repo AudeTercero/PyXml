@@ -325,6 +325,7 @@ def buscar_vehiculo(matricula, xml_path):
 
 
 # ******************** FUNCIONES  ALQUILER **************************************
+
 def crearAlquiler(dni, fechaIni, fechaFin, kmIni, idVe):
     """
     Funcion crear un alquiler que lo guarda en el fichero de alquleres.xml
