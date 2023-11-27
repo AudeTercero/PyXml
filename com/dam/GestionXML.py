@@ -397,6 +397,10 @@ def precioFin(fechaIni, fechaFin, idVe):
 
 
 def listado_coches_disponibles():
+    """
+        Funcion para obtener un listado de vehiculos disponibles del dni recibido
+        :return: Retorna un diccionario con los vehiculos disponibles
+        """
     tree = ET.parse('vehiculos.xml')
     root = tree.getroot()
     dicVeh = {}
@@ -429,6 +433,11 @@ def diponibles():
 
 
 def alquiDisp(dniRec):
+    """
+    Funcion para obtener un listado de alquileres activo del dni recibido
+    :param dniRec: Recibe el dni para buscarlo
+    :return: Retorna un diccionario de alqulieres activos
+    """
     if (Path('alquileres.xml').exists()):
         tree = ET.parse('alquileres.xml')
         root = tree.getroot()
@@ -438,8 +447,8 @@ def alquiDisp(dniRec):
             idVeh = elemento.find('id_vehiculo').text
             dni = elemento.find('dni').text
             fechaIni = elemento.find('fecha_inicio').text
-            if (dni == dniRec and elemento.find('esetado') == 'Activo'):
-                dicAlq[idAlq] = {'Id_Vehiculo': idVeh, 'Dni': dni, 'Fecha_Inicio': fechaIni}
+            if (dni == dniRec and elemento.find('estado').text == 'Activo'):
+                dicAlq[idAlq] = {'Id_Vehiculo': idVeh, 'dni': dni, 'Fecha_Inicio': fechaIni}
         return dicAlq
 
 def alquileres_activos():
@@ -451,13 +460,19 @@ def alquileres_activos():
         tree = ET.parse('alquileres.xml')
         root = tree.getroot()
         for elemento in root.iter('alquiler'):
-            if (elemento.find('esetado') == 'Activo'):
+            if (elemento.find('estado').text == 'Activo'):
                 return True
         return False
 
 
 # Este metodo va en GestionXMl y hay que modificar la linea 277 de la funcion obtIdVe(matVe) y ponerle .text
 def mostrar_por_elemento(etiqueta, abuscar):
+    """
+    Funcion que muestra un alquiler dependiendo de los paramatros que recibe
+    :param etiqueta: Recibe la etiqueta del elemento a buscar
+    :param abuscar: Recibe el texto a buscar
+    :return:
+    """
     tree = ET.parse('alquileres.xml')
     root = tree.getroot()
     existencias = False
@@ -494,6 +509,12 @@ def mostrar_por_elemento(etiqueta, abuscar):
 # ******************** FUNCIONES  COMUNES **************************************
 
 def obtId(fichero, etiqueta):
+    """
+    Funcion para generar ids automaitcas que no sean repetidas
+    :param fichero: Recibe el fichero
+    :param etiqueta: Recibe la etiqueta para iterar
+    :return:
+    """
     aux = 1
     if (Path(fichero).exists()):
         tree = ET.parse(fichero)
@@ -508,6 +529,11 @@ def obtId(fichero, etiqueta):
 
 
 def eliminarEspacios(fichero):
+    """
+    Funcion para eliminar las lineas vacias que se van creando con la funcion prettify
+    :param fichero: Recibe el fichero
+    :return:
+    """
     if (Path(fichero).exists()):
         with open(fichero, 'r') as file:
             contenido = file.read()
@@ -518,6 +544,11 @@ def eliminarEspacios(fichero):
 
 
 def prettify(elem):
+    """
+    Funcion para formatear el documento
+    :param elem: Recibe el elemento a formatear
+    :return:
+    """
     from xml.etree import ElementTree
     from xml.dom import minidom
 
@@ -526,8 +557,16 @@ def prettify(elem):
     return reparsed.toprettyxml(indent="  ")
 
 
-# Funcion para modificar el texto de un elemento(ESTO VA EN GESTIONXML)
 def modificar_etiqueta(fichero, iterable, etiqueta, id_elemento, texto_cambio):
+    """
+    Funcion para modificar el texto de un elemento
+    :param fichero: Recibe el nombre del fichero
+    :param iterable: Recibe el elemento a iterar
+    :param etiqueta: Recibe la etiqueta del elemento que queremos cambiar el texto
+    :param id_elemento: Recibe la id del que queremos modificar
+    :param texto_cambio: Recibe el texto a introducir en el elemento
+    :return:
+    """
     salir = False
     tree = ET.parse(fichero)
     root = tree.getroot()
@@ -561,7 +600,6 @@ def modificar_etiqueta(fichero, iterable, etiqueta, id_elemento, texto_cambio):
             print("Entrada no valida.")
 
 
-# Funcion para ver si existe la id
 def existe_id(fichero, id, etiquieta):
     """
     Funcion que comprueba si existe una id

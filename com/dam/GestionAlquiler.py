@@ -62,8 +62,8 @@ def cochesDisp():
     cont = 0
     while (opcCorrect is False and cont < 3):
         for clave, contenido in dicCoches.items():
-            print(f'Id: {clave}')
-            print(contenido)
+            print(
+                f'Id Vehiculo: {clave} [ Matricula: {contenido.get('mat')}, Marca: {contenido.get('marca')}, Modelo: {contenido.get('modelo')}]')
             print('++++++++++++++++++++++++++++++')
         opc = input("Seleccion la id del vehiculo que quieres alquilar:")
         for clave in dicCoches.keys():
@@ -112,7 +112,6 @@ def finAlquiler():
         GestionXML.finAlquiler(fechaDevo, kmFin, idAlq)
 
 
-# pide un dni para buscarlo en el fichero xml y muestra todos los que hay para elegir uno
 def alquilerDni():
     """
     Funcion que pide un dni para buscarlo en el fichero xml y muestra todos los que hay para elegir uno
@@ -130,14 +129,14 @@ def alquilerDni():
                     dni = aux
                     cont = 0
                     dic_alqui = GestionXML.alquiDisp(dni)
-                    if(not dic_alqui):
+                    if (not dic_alqui):
                         print('No hay alquileres activos para ese dni')
                         dni = None
                         cont += 1
                     else:
                         for clave, contenido in dic_alqui.items():
-                            print(f'Id: {clave}')
-                            print(contenido.get('Id_Vehiculo'))
+                            print(
+                                f'Id Alquiler: {clave} [Id Vehiculo: {contenido.get('Id_Vehiculo')}, DNI Cliente: {contenido.get('dni')}, Fecha Inicio: {contenido.get('Fecha_Inicio')}]')
                             print('++++++++++++++++++++++++++++++')
                         opc = input("Seleccion la id del alquiler:")
                         for clave in dic_alqui.keys():
@@ -151,7 +150,7 @@ def alquilerDni():
                             cont += 1
                 else:
                     print('Saliendo...')
-                    opcCorrect = True
+                    return -2
         except VerificationExceptions.MisExceptions as err:
             cont += 1
             print(err)
@@ -233,9 +232,37 @@ def modificar():
                 else:
                     print("No puedes fallar mas de 3 veces")
             elif opc == "4":
-                modificador_fechas('fecha_inicio', idAlq)
+                fallos = 0
+                fecha = None
+                while (fallos < 3 and fecha is None):
+                    try:
+                        aux = input(f'Escriba la nueva {'fecha_inicio'}:')
+                        VerificationExceptions.formatoFecha(aux)
+                        fecha = aux
+                    except VerificationExceptions.MisExceptions as err:
+                        print(err)
+                        fallos += 1
+                if (fallos < 3):
+                    GestionXML.modificar_etiqueta('alquileres.xml', 'alquiler', 'fecha_inicio', idAlq, fecha)
+                else:
+                    print("No puedes fallar mas de 3 veces")
             elif opc == "5":
-                modificador_fechas('fecha_final', idAlq)
+                fallos = 0
+                fecha = None
+                while (fallos < 3 and fecha is None):
+                    try:
+                        aux = input(f'Escriba la nueva {'fecha_final'}:')
+                        fecha_ini = GestionXML.obt_elemento("alquileres.xml", idAlq, 'alquiler', 'fecha_inicio')
+                        VerificationExceptions.formatoFecha(aux)
+                        VerificationExceptions.dife_fechas(fecha_ini, aux)
+                        fecha = aux
+                    except VerificationExceptions.MisExceptions as err:
+                        print(err)
+                        fallos += 1
+                if (fallos < 3):
+                    GestionXML.modificar_etiqueta('alquileres.xml', 'alquiler', 'fecha_final', idAlq, fecha)
+                else:
+                    print("No puedes fallar mas de 3 veces")
             elif opc == "6":
                 fallos = 0
                 km = None
@@ -256,31 +283,8 @@ def modificar():
                 salir = True
             else:
                 print("Esa opcion no existe")
-    else:
+    elif (idAlq == -1):
         print('No puedes fallar mas de 3 veces')
-
-
-def modificador_fechas(etiqueta, id_alquiler):
-    """
-    Funcion para modificar fechas
-    :param etiqueta: recibe la etiqueta que sera con la que podemos identificar que querermos modificar del xml
-    :param id_alquiler:recibe la id del alquiler que estamos modificando
-    :return:
-    """
-    fallos = 0
-    fecha = None
-    while (fallos < 3 and fecha is None):
-        try:
-            aux = input(f'Escriba la nueva {etiqueta}:')
-            VerificationExceptions.formatoFecha(aux)
-            fecha = aux
-        except VerificationExceptions.MisExceptions as err:
-            print(err)
-            fallos += 1
-    if (fallos < 3):
-        GestionXML.modificar_etiqueta('alquileres.xml', 'alquiler', etiqueta, id_alquiler, fecha)
-    else:
-        print("No puedes fallar mas de 3 veces")
 
 
 def buscarMatricula():
@@ -291,6 +295,7 @@ def buscarMatricula():
     fallos = 0
     salir = False
     id_veh = None
+    matricula = None
     while (fallos < 3 and salir is False):
         matricula = input("Introduzca la matricula del vehiculo o pulse 0 para salir:")
         if (matricula != '0'):
@@ -308,7 +313,7 @@ def buscarMatricula():
                 fallos += 1
         else:
             salir = True
-    if (fallos < 3 and salir is True):
+    if (fallos < 3 and matricula != '0'):
         GestionXML.mostrar_por_elemento('id_vehiculo', id_veh)
     elif (fallos == 3):
         print("Se han cometido mas de 3 fallos")
@@ -335,7 +340,7 @@ def buscarDni():
                 fallos += 1
         else:
             salir = True
-    if (fallos < 3 and salir is True):
+    if (fallos < 3 and dni != '0'):
         GestionXML.mostrar_por_elemento('dni', dni)
 
     elif (fallos == 3):
@@ -368,7 +373,7 @@ def menu():
                 else:
                     print("No hay coches disponibles")
             elif opc == "2":
-                if(Path('alquileres.xml').exists() and GestionXML.alquileres_activos() is True):
+                if (Path('alquileres.xml').exists() and GestionXML.alquileres_activos() is True):
                     finAlquiler()
                 else:
                     print("No hay alquileres activos")
@@ -379,7 +384,7 @@ def menu():
                     print("No hay alquileres activos. Solo se pueden modificar los alquileres que estan activos")
 
             elif opc == "4":
-                if(Path('alquileres.xml').exists()):
+                if (Path('alquileres.xml').exists()):
                     buscarMatricula()
                 else:
                     print("No hay alquileres aun guardados")
