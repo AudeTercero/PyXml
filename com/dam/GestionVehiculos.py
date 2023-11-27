@@ -3,10 +3,10 @@ import VerificationExceptions
 
 
 def alta():
-    '''
+    """
     Metodo para guardar nuevos vehiculos
     :return:
-    '''
+    """
 
     xmlPath = "vehiculos.xml"
     salir = False
@@ -124,7 +124,8 @@ def alta():
     cont = 0
     while not salir and not salir_sin_guardar:
         if not cont == 3:
-            estado = input("Ingrese el estado del vehiculo (disponible, alquilado o mantenimiento) o pulse 0 para salir: ")
+            estado = input(
+                "Ingrese el estado del vehiculo (disponible, alquilado o mantenimiento) o pulse 0 para salir: ")
             if (estado == "0"):
                 salir_sin_guardar = True
                 salir = True
@@ -147,10 +148,10 @@ def alta():
 
 
 def baja():
-    '''
+    """
     Metodo para eliminar vehiculos guardados
     :return:
-    '''
+    """
 
     xmlPath = "vehiculos.xml"
     cont = 0
@@ -200,10 +201,10 @@ def baja():
 
 
 def modificar():
-    '''
+    """
     Metodo para modificar los atributos de los vehiculos guardados
     :return:
-    '''
+    """
 
     xml_path = "vehiculos.xml"
     cont = 0
@@ -243,10 +244,10 @@ def modificar():
 
 
 def buscar():
-    '''
+    """
     Metodo que permite mostrar los atributos de un vehiculo solicitado
     :return:
-    '''
+    """
 
     xml_path = "vehiculos.xml"
     cont = 0
@@ -284,10 +285,10 @@ def buscar():
 
 
 def mostrar():
-    '''
+    """
     Metodo que muestra los atributos de todos los vehiculos guardados
     :return:
-    '''
+    """
 
     xml_path = "vehiculos.xml"
 
@@ -298,10 +299,10 @@ def mostrar():
 
 
 def menu():
-    '''
+    """
     Metodo que sirve de menu para acceder a las distintas funciones de la gestion de vehiculos
     :return:
-    '''
+    """
 
     salir = True
     while (salir):

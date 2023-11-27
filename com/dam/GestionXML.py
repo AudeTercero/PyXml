@@ -5,8 +5,14 @@ from datetime import datetime
 
 
 # ******************** FUNCIONES  VEHICULOS **************************************
-# Funcion para ver si existe la matricula
+
 def existe_matricula(fichero, matricula):
+    """
+    Funcion para comprobar si existe la matricula o no
+    :param fichero: recibe el fichero
+    :param matricula: recibe la matricula
+    :return: retorna true o false segun si existe o no
+    """
     if (Path(fichero).exists() is True):
         tree = ET.parse(fichero)
         root = tree.getroot()
@@ -18,6 +24,12 @@ def existe_matricula(fichero, matricula):
 
 
 def obtener_atributos_vehiculo(xml_path, matricula):
+    """
+    Funcion para obntener un listado de con los atributos de un vehiculo
+    :param xml_path: recibe le fichero
+    :param matricula: recibe la matricula del vehiculo
+    :return: retorna los atributos del vehiculo
+    """
     atributos_vehiculo = []
 
     if Path(xml_path).exists():
@@ -43,7 +55,13 @@ def obtener_atributos_vehiculo(xml_path, matricula):
 
     return atributos_vehiculo
 
+
 def hay_vehiculos(xml_path):
+    """
+    Funcion para comprobar si hay vehiculos guardados
+    :param xml_path: recibe el fichero
+    :return: retorna true o false encaso de que encuentre vehiculos o no
+    """
     try:
         tree = ET.parse(xml_path)
         root = tree.getroot()
@@ -58,8 +76,13 @@ def hay_vehiculos(xml_path):
     except Exception as e:
         print(f"Error: {e}")
 
-# Funcion para mostrar todos los vehiculos guardados
+
 def leer_vehiculos(xml_path):
+    """
+    Funcion para mostrar todos los vehiculos guardados
+    :param xml_path: Recibe el fichero
+    :return:
+    """
     if Path(xml_path).exists():
         tree = ET.parse(xml_path)
         root = tree.getroot()
@@ -88,8 +111,18 @@ Estado: {estado}
 ***********************''')
 
 
-# Funcion para guardar vehiculos
 def aniadir_vehiculo(matricula, marca, modelo, anio_fabricacion, tarifa_dia, estado, xml_path):
+    """
+    Funcion para guardar vehiculos
+    :param matricula: recibe la matricula del vehiculo
+    :param marca: recibe la marca del vehiculo
+    :param modelo: recibe el modelo del vehiculo
+    :param anio_fabricacion: recibe el anio de fabricacion
+    :param tarifa_dia: recibe la tarifa por dia
+    :param estado: recibe el estado del vehiculo
+    :param xml_path: recibe el fichero
+    :return:
+    """
     try:
         tree = ET.parse(xml_path)
         root = tree.getroot()
@@ -121,8 +154,13 @@ def aniadir_vehiculo(matricula, marca, modelo, anio_fabricacion, tarifa_dia, est
     eliminarEspacios("vehiculos.xml")
 
 
-# Funcion para eliminar vehiculos guardados
 def eliminar_vehiculo(matricula, xml_path):
+    """
+    Funcion para eliminar vehiculos guardados
+    :param matricula: recibe la matricula del vehilo que queremos eliminar
+    :param xml_path: recibe le fichero de vehiculos
+    :return:
+    """
     try:
         tree = ET.parse(xml_path)
         root = tree.getroot()
@@ -141,8 +179,13 @@ def eliminar_vehiculo(matricula, xml_path):
         print(f"Error: {e}")
 
 
-# Funcion para modificar vehiculos guardados
 def modificar_vehiculo(matricula, xml_path):
+    """
+    Funcion para modificar los vehiculos guardados
+    :param matricula: recibe la matricula del vehiculo a modificar
+    :param xml_path: recibe el fichero de vehiculos
+    :return:
+    """
     vehiculo_encontrado = False
     try:
         tree = ET.parse(xml_path)
@@ -226,8 +269,13 @@ def modificar_vehiculo(matricula, xml_path):
         print(f"Error: {e}")
 
 
-# Funcion para buscar vehiculos guardados
 def buscar_vehiculo(matricula, xml_path):
+    """
+    Funcion para buscar un vehiculo por matricula
+    :param matricula: recibe la matricula del vehiculo
+    :param xml_path: recibe el fichero en el que vamos a guardar los datos
+    :return:
+    """
     try:
         tree = ET.parse(xml_path)
         root = tree.getroot()
@@ -262,6 +310,15 @@ def buscar_vehiculo(matricula, xml_path):
 
 # ******************** FUNCIONES  ALQUILER **************************************
 def crearAlquiler(dni, fechaIni, fechaFin, kmIni, idVe):
+    """
+    Funcion crear un alquiler que lo guarda en el fichero de alquleres.xml
+    :param dni: Recibe dni del cliente
+    :param fechaIni: Recibe la fecha de inicio
+    :param fechaFin: Recibe la fecha final
+    :param kmIni: Recibe los kilometros iniciales
+    :param idVe: Recibe la id de vehiculo
+    :return:
+    """
     try:
         tree = ET.parse('alquileres.xml')
         root = tree.getroot()
@@ -306,6 +363,11 @@ def crearAlquiler(dni, fechaIni, fechaFin, kmIni, idVe):
 
 
 def obtIdVe(matVe):
+    """
+    Funcion para obtener la id de un vehiculo en caso de no encontrarla devuelve un -1
+    :param matVe: Recibe la matricula de un vehiculo
+    :return: Retorna la id si la encuentra o -1 en caso contrario
+    """
     tree = ET.parse('vehiculos.xml')
     root = tree.getroot()
     for elemento in root.iter('vehiculo'):
@@ -469,6 +531,7 @@ def alquiDisp(dniRec):
                 dicAlq[idAlq] = {'Id_Vehiculo': idVeh, 'dni': dni, 'Fecha_Inicio': fechaIni}
         return dicAlq
 
+
 def alquileres_activos():
     """
     Funcion que comprueba si hay alquileres Activos
@@ -483,7 +546,6 @@ def alquileres_activos():
         return False
 
 
-# Este metodo va en GestionXMl y hay que modificar la linea 277 de la funcion obtIdVe(matVe) y ponerle .text
 def mostrar_por_elemento(etiqueta, abuscar):
     """
     Funcion que muestra un alquiler dependiendo de los paramatros que recibe
