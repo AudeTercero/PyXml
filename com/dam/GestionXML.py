@@ -17,9 +17,24 @@ def existe_matricula(fichero, matricula):
         tree = ET.parse(fichero)
         root = tree.getroot()
         for elemento in root.iter('vehiculo'):
-            mat_aux = elemento.get('matricula')
+            mat_aux = elemento.find('matricula').text
             if (matricula == mat_aux):
                 return True
+    return False
+
+
+def esta_disponible(fichero, matricula):
+    if (Path(fichero).exists() is True):
+        tree = ET.parse(fichero)
+        root = tree.getroot()
+        for elemento in root.iter('vehiculo'):
+            mat_aux = elemento.find('matricula').text
+
+            if (matricula == mat_aux):
+                estado = elemento.find("estado").text
+
+                if estado == "disponible":
+                    return True
     return False
 
 
@@ -67,6 +82,7 @@ def hay_vehiculos(xml_path):
         root = tree.getroot()
 
         if not root.findall("vehiculo"):
+            print("No hay vehiculos guardados.")
             return False
         else:
             return True

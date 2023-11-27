@@ -188,16 +188,19 @@ def baja():
             if cont < 3 and matricula != "0":
                 salir = False
 
-                while not salir:
-                    op = input("Seguro que quieres borrar el vehiculo? [S/N]").lower()
-                    if (op == "s"):
-                        GestionXML.eliminar_vehiculo(matricula, xmlPath)
-                        salir = True
-                    elif (op == "n"):
-                        print("Saliendo...")
-                        salir = True
-                    else:
-                        print("Opcion no valida.")
+                if GestionXML.esta_disponible(xmlPath, matricula):
+                    while not salir:
+                        op = input("Seguro que quieres borrar el vehiculo? [S/N]").lower()
+                        if (op == "s"):
+                            GestionXML.eliminar_vehiculo(matricula, xmlPath)
+                            salir = True
+                        elif (op == "n"):
+                            print("Saliendo...")
+                            salir = True
+                        else:
+                            print("Opcion no valida.")
+                else:
+                    print("El vehiculo no esta disponible en estos momentos y no se puede borrar. \nSaliendo...")
 
 
 def modificar():

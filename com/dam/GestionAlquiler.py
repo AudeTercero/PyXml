@@ -63,7 +63,7 @@ def cochesDisp():
     while (opcCorrect is False and cont < 3):
         for clave, contenido in dicCoches.items():
             print(
-                f'Id Vehiculo: {clave} [ Matricula: {contenido.get('mat')}, Marca: {contenido.get('marca')}, Modelo: {contenido.get('modelo')}]')
+                f'Id Vehiculo: {clave} [ Matricula: {contenido.get("mat")}, Marca: {contenido.get("marca")}, Modelo: {contenido.get("modelo")}]')
             print('++++++++++++++++++++++++++++++')
         opc = input("Seleccion la id del vehiculo que quieres alquilar:")
         for clave in dicCoches.keys():
@@ -136,7 +136,7 @@ def alquilerDni():
                     else:
                         for clave, contenido in dic_alqui.items():
                             print(
-                                f'Id Alquiler: {clave} [Id Vehiculo: {contenido.get('Id_Vehiculo')}, DNI Cliente: {contenido.get('dni')}, Fecha Inicio: {contenido.get('Fecha_Inicio')}]')
+                                f'Id Alquiler: {clave} [Id Vehiculo: {contenido.get("Id_Vehiculo")}, DNI Cliente: {contenido.get("dni")}, Fecha Inicio: {contenido.get("Fecha_Inicio")}]')
                             print('++++++++++++++++++++++++++++++')
                         opc = input("Seleccion la id del alquiler:")
                         for clave in dic_alqui.keys():
@@ -236,7 +236,7 @@ def modificar():
                 fecha = None
                 while (fallos < 3 and fecha is None):
                     try:
-                        aux = input(f'Escriba la nueva {'fecha_inicio'}:')
+                        aux = input(f'Escriba la nueva {"fecha_inicio"}:')
                         VerificationExceptions.formatoFecha(aux)
                         fecha = aux
                     except VerificationExceptions.MisExceptions as err:
@@ -251,7 +251,7 @@ def modificar():
                 fecha = None
                 while (fallos < 3 and fecha is None):
                     try:
-                        aux = input(f'Escriba la nueva {'fecha_final'}:')
+                        aux = input(f'Escriba la nueva {"fecha_final"}:')
                         fecha_ini = GestionXML.obt_elemento("alquileres.xml", idAlq, 'alquiler', 'fecha_inicio')
                         VerificationExceptions.formatoFecha(aux)
                         VerificationExceptions.dife_fechas(fecha_ini, aux)
