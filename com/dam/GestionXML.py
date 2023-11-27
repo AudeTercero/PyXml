@@ -17,8 +17,8 @@ def existe_matricula(fichero, matricula):
     return False
 
 
-def obtener_vehiculo(xml_path, matricula):
-    vehiculo_buscado = None
+def obtener_atributos_vehiculo(xml_path, matricula):
+    atributos_vehiculo = []
 
     if Path(xml_path).exists():
         try:
@@ -28,15 +28,35 @@ def obtener_vehiculo(xml_path, matricula):
             for vehiculo in root.findall('vehiculo'):
                 mat_vehi = vehiculo.find('matricula').text
                 if (mat_vehi == matricula):
-                    vehiculo_buscado = vehiculo
+                    atributos_vehiculo.append(vehiculo.find("id").text)
+                    atributos_vehiculo.append(vehiculo.find("matricula").text)
+                    atributos_vehiculo.append(vehiculo.find("descripcion/marca").text)
+                    atributos_vehiculo.append(vehiculo.find("descripcion/modelo").text)
+                    atributos_vehiculo.append(vehiculo.find("id").text)
+                    atributos_vehiculo.append(vehiculo.find("id").text)
+                    atributos_vehiculo.append(vehiculo.find("estado").text)
 
         except FileNotFoundError:
             print("No hay vehiculos guardados")
         except Exception as e:
             print(f"Error: {e}")
 
-    return vehiculo_buscado
+    return atributos_vehiculo
 
+def hay_vehiculos(xml_path):
+    try:
+        tree = ET.parse(xml_path)
+        root = tree.getroot()
+
+        if not root.findall("vehiculo"):
+            return False
+        else:
+            return True
+
+    except FileNotFoundError:
+        print("No hay vehiculos guardados")
+    except Exception as e:
+        print(f"Error: {e}")
 
 # Funcion para mostrar todos los vehiculos guardados
 def leer_vehiculos(xml_path):

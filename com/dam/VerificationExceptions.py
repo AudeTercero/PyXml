@@ -44,10 +44,9 @@ def matFormat(matricula):
     """
     if len(matricula) != 7:
         raise MisExceptions('Debe tener 7 caractres')
-    if not matricula[-3:]:
-        raise MisExceptions('No se cumple con el formato. Debe tener 4 digitos y 3 letra.')
-    if not matricula[:4]:
-        raise MisExceptions('No se cumple con el formato. Debe tener 4 digitos y 3 letra.')
+    if not matricula[:4].isdigit() or not matricula[4:].isalpha():
+        raise MisExceptions(
+            'La matrícula no cumple con el formato. Debe tener 4 dígitos y 3 letras.')
 
 
 def esNum(num):
@@ -57,8 +56,7 @@ def esNum(num):
     :return:
     """
     try:
-        int(num)
-        if(num < 0):
+        if(int(num) < 0):
             raise MisExceptions("El numero no puede ser menor que 0")
     except Exception:
         raise MisExceptions('Debe introducir solo numeros')
