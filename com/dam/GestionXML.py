@@ -316,6 +316,13 @@ def obtIdVe(matVe):
 
 
 def finAlquiler(fechaDevo, kmFin, id):
+    """
+    Funcion para guardar los datos recibidos por parametros para finalizar un alquiler
+    :param fechaDevo: Recibe la fecha de devolucion
+    :param kmFin: Recibe los kilometros finales
+    :param id: Recibe la id del alquiler
+    :return:
+    """
     if (Path('alquileres.xml').exists()):
         tree = ET.parse('alquileres.xml')
         root = tree.getroot()
@@ -348,6 +355,10 @@ def finAlquiler(fechaDevo, kmFin, id):
 
 
 def mostrarTodoAlq():
+    """
+    Funcion que muestra los datos del los alquileres del fichero
+    :return:
+    """
     if (Path('alquileres.xml').exists()):
         tree = ET.parse('alquileres.xml')
         root = tree.getroot()
@@ -385,6 +396,13 @@ Estado: {est}
 
 
 def precioFin(fechaIni, fechaFin, idVe):
+    """
+    Funcion para calcular el precio final
+    :param fechaIni: recibe la fecha incial
+    :param fechaFin: Recibe la fecha final
+    :param idVe: Recibe la id del Vehiculo
+    :return: Retorna la el precio final y calculado
+    """
     tree = ET.parse('vehiculos.xml')
     root = tree.getroot()
     for elemento in root.iter('vehiculo'):
