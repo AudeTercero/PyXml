@@ -12,42 +12,57 @@ def iniAlquiler():
     fechaIni = None
     fechaFin = None
     kmIni = None
+    opcSalir = None
     intentos = 0
     salir = False
     idCoche = cochesDisp()
-    if (idCoche != -1):
+    if (idCoche != -1 and idCoche != -2):
         while (intentos < 3 and salir is False):
             try:
-                if (dni is None):
-                    aux = input('Introduce el dni del cliente:\n')
-                    VerificationExceptions.dniFormat(aux)
-                    dni = aux
-                    intentos = 0
-                if (fechaIni is None):
-                    aux = input('Introduce la fecha de inicio del alquiler(yyyy-mm-dd):\n')
-                    VerificationExceptions.formatoFecha(aux)
-                    fechaIni = aux
-                    intentos = 0
-                if (fechaFin is None):
-                    aux = input('Introduce la fecha final del alquiler(yyyy-mm-dd):\n')
-                    VerificationExceptions.formatoFecha(aux)
-                    VerificationExceptions.dife_fechas(fechaIni, aux)
-                    fechaFin = aux
-                    intentos = 0
-                if (kmIni is None):
-                    aux = input('Introduce los kilometros iniciales:\n')
-                    VerificationExceptions.esNum(aux)
-                    kmIni = aux
-                    intentos = 0
+                if (dni is None and opcSalir != '0'):
+                    aux = input('Introduce el dni del cliente o 0 para salir:\n')
+                    opcSalir = aux
+                    if (opcSalir != '0'):
+                        VerificationExceptions.dniFormat(aux)
+                        dni = aux
+                        intentos = 0
+                if (fechaIni is None and opcSalir != '0'):
+                    aux = input('Introduce la fecha de inicio del alquiler(yyyy-mm-dd) o 0 para salir:\n')
+                    opcSalir = aux
+                    if (opcSalir != '0'):
+                        VerificationExceptions.formatoFecha(aux)
+                        fechaIni = aux
+                        intentos = 0
+                if (fechaFin is None and opcSalir != '0'):
+                    aux = input('Introduce la fecha final del alquiler(yyyy-mm-dd) o 0 para salir:\n')
+                    opcSalir = aux
+                    if (opcSalir != '0'):
+                        VerificationExceptions.formatoFecha(aux)
+                        VerificationExceptions.dife_fechas(fechaIni, aux)
+                        fechaFin = aux
+                        intentos = 0
+                if (kmIni is None and opcSalir != '0'):
+                    aux = input('Introduce los kilometros iniciales o 0 para salir:\n')
+                    opcSalir = aux
+                    if (opcSalir != '0'):
+                        VerificationExceptions.esNum(aux)
+                        kmIni = aux
+                        intentos = 0
+                        salir = True
+                if(opcSalir == '0'):
                     salir = True
             except VerificationExceptions.MisExceptions as err:
                 intentos += 1
                 print(err)
-    else:
+    elif (idCoche == -1):
         intentos = 3
-    if (intentos < 3):
+    else:
+        opcSalir = '0'
+    if (intentos < 3 and opcSalir != '0'):
         GestionXML.crearAlquiler(dni, fechaIni, fechaFin, kmIni, idCoche)
         print("Guardado correctamente")
+    elif (opcSalir == '0'):
+        print("Saliendo")
     else:
         print("Se han superado el maximo de errores.")
 
@@ -65,14 +80,17 @@ def cochesDisp():
             print(
                 f'Id Vehiculo: {clave} [ Matricula: {contenido.get("mat")}, Marca: {contenido.get("marca")}, Modelo: {contenido.get("modelo")}]')
             print('++++++++++++++++++++++++++++++')
-        opc = input("Seleccion la id del vehiculo que quieres alquilar:")
-        for clave in dicCoches.keys():
-            if (clave == opc):
-                opcCorrect = True
-        if (opcCorrect == True):
-            return opc
+        opc = input("Seleccion la id del vehiculo que quieres alquilar o 0 para Salir:")
+        if(opc != '0'):
+            for clave in dicCoches.keys():
+                if (clave == opc):
+                    opcCorrect = True
+            if (opcCorrect == True):
+                return opc
+            else:
+                print('Esa id no esta en la lista')
         else:
-            print('Esa id no esta en la lista')
+            return -2
     return -1
 
 
@@ -84,34 +102,48 @@ def finAlquiler():
     fechaDevo = None
     kmFin = None
     idAlq = None
+    opcSalir = None
     intentos = 0
     opcCorrect = False
     while (intentos < 3 and opcCorrect is False):
         try:
             idAlq = alquilerDni()
-            if (idAlq != -1):
-                if (fechaDevo is None):
-                    aux = input('Introduce la fecha de la devolucion del vehiculo(yyyy-mm-dd):\n')
-                    VerificationExceptions.formatoFecha(aux)
-                    fecha_ini = GestionXML.obt_elemento("alquileres.xml", idAlq, 'alquiler', 'fecha_inicio')
-                    VerificationExceptions.dife_fechas(fecha_ini, aux)
-                    fechaDevo = aux
-                    intentos = 0
-                if (kmFin is None):
-                    aux = input('Introduce el kilometraje final:\n')
-                    VerificationExceptions.esNum(aux)
-                    kmFin = aux
-                    intentos = 0
-                opcCorrect = True
-            else:
+            if (idAlq != -1 and idAlq != -2):
+                if (fechaDevo is None and opcSalir != "0"):
+                    aux = input('Introduce la fecha de la devolucion del vehiculo(yyyy-mm-dd) o 0 para salir:\n')
+                    opcSalir = aux
+                    if (opcSalir != '0'):
+                        VerificationExceptions.formatoFecha(aux)
+                        fecha_ini = GestionXML.obt_elemento("alquileres.xml", idAlq, 'alquiler', 'fecha_inicio')
+                        VerificationExceptions.dife_fechas(fecha_ini, aux)
+                        fechaDevo = aux
+                        intentos = 0
+                if (kmFin is None and opcSalir != "0"):
+                    aux = input('Introduce el kilometraje final o 0 para salir:\n')
+                    opcSalir = aux
+                    if (opcSalir != '0'):
+                        VerificationExceptions.esNum(aux)
+                        kmFin = aux
+                        intentos = 0
+                        opcCorrect = True
+                if(opcSalir == "0"):
+                    print("Saliendo...")
+                    opcCorrect = True
+            elif(idAlq == -1):
                 intentos = 3
+            else:
+                opcSalir = "0"
+                opcCorrect = True
+
         except VerificationExceptions.MisExceptions as err:
             intentos += 1
             print(err)
-    if (intentos < 3):
+    if (intentos < 3 and opcSalir != "0"):
         GestionXML.finAlquiler(fechaDevo, kmFin, idAlq)
         print("Se ha finalizado correctamente el alquiler")
         GestionXML.mostrar_por_atributo(idAlq)
+    elif(intentos == 3):
+        print("No se puede cometer mas de 3 errores seguidos")
 
 
 def alquilerDni():
@@ -140,16 +172,20 @@ def alquilerDni():
                             print(
                                 f'Id Alquiler: {clave} [Id Vehiculo: {contenido.get("Id_Vehiculo")}, DNI Cliente: {contenido.get("dni")}, Fecha Inicio: {contenido.get("Fecha_Inicio")}]')
                             print('++++++++++++++++++++++++++++++')
-                        opc = input("Seleccion la id del alquiler:")
-                        for clave in dic_alqui.keys():
-                            if (clave == opc):
-                                opcCorrect = True
-                        if (opcCorrect == True):
-                            return opc
+                        opc = input("Seleccion la id del alquiler o 0 para salir:")
+                        if(opc != "0"):
+                            for clave in dic_alqui.keys():
+                                if (clave == opc):
+                                    opcCorrect = True
+                            if (opcCorrect == True):
+                                return opc
+                            else:
+                                print('Esa id no esta en la lista')
+                                dni = None
+                                cont += 1
                         else:
-                            print('Esa id no esta en la lista')
-                            dni = None
-                            cont += 1
+                            print("Saliendo...")
+                            return -2
                 else:
                     print('Saliendo...')
                     return -2
