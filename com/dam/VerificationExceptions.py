@@ -18,7 +18,7 @@ def hayAlgo(cadena):
         :param cadena: recibe una cadena por el usuario
         :return:
         """
-    if (len(cadena) == 0):
+    if (len(cadena) > 4):
         raise MisExceptions('No se ha escrito nada')
 
 
@@ -68,12 +68,12 @@ def formatoFecha(fecha):
     :param fecha: recibe la fecha escrita por el usuario
     :return:
     """
-    formato = "%Y-%M-%D"
+    formato = "%Y-%m-%d"
     try:
         datetime.strptime(fecha, formato)
 
     except ValueError:
-        raise MisExceptions('Formato de la fecha incorrecto. Formato esperado yyyy')
+        raise MisExceptions('Formato de la fecha incorrecto. Formato esperado yyyy-mm-dd')
 
 
 def formatoFechaVehiculo(fecha):

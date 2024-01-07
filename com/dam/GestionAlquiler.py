@@ -8,76 +8,80 @@ def iniAlquiler():
     Funcion para dar de alta un alquiler con los datos para ello
     :return:
     """
-    dni = None
-    fechaIni = None
-    fechaFin = None
-    kmIni = None
-    opcSalir = None
-    intentos = 0
     salir = False
-    idCoche = cochesDisp()
     while not salir:
-        if (idCoche != -1 and idCoche != -2):
-            while (intentos < 3 and salir is False):
-                try:
-                    if (dni is None and opcSalir != '0'):
-                        aux = input('Introduce el dni del cliente o 0 para salir:\n')
-                        opcSalir = aux
-                        if (opcSalir != '0'):
-                            VerificationExceptions.dniFormat(aux)
-                            dni = aux
-                            intentos = 0
-                    if (fechaIni is None and opcSalir != '0'):
-                        aux = input('Introduce la fecha de inicio del alquiler(yyyy-mm-dd) o 0 para salir:\n')
-                        opcSalir = aux
-                        if (opcSalir != '0'):
-                            VerificationExceptions.formatoFecha(aux)
-                            fechaIni = aux
-                            intentos = 0
-                    if (fechaFin is None and opcSalir != '0'):
-                        aux = input('Introduce la fecha final del alquiler(yyyy-mm-dd) o 0 para salir:\n')
-                        opcSalir = aux
-                        if (opcSalir != '0'):
-                            VerificationExceptions.formatoFecha(aux)
-                            VerificationExceptions.dife_fechas(fechaIni, aux)
-                            fechaFin = aux
-                            intentos = 0
-                    if (kmIni is None and opcSalir != '0'):
-                        aux = input('Introduce los kilometros iniciales o 0 para salir:\n')
-                        opcSalir = aux
-                        if (opcSalir != '0'):
-                            VerificationExceptions.esNum(aux)
-                            kmIni = aux
-                            intentos = 0
+        dni = None
+        fechaIni = None
+        fechaFin = None
+        kmIni = None
+        opcSalir = None
+        intentos = 0
+        if (GestionXML.diponibles() is True):
+            idCoche = cochesDisp()
+            if (idCoche != -1 and idCoche != -2):
+                while (intentos < 3 and salir is False):
+                    try:
+                        if (dni is None and opcSalir != '0'):
+                            aux = input('Introduce el dni del cliente o 0 para salir:\n')
+                            opcSalir = aux
+                            if (opcSalir != '0'):
+                                VerificationExceptions.dniFormat(aux)
+                                dni = aux
+                                intentos = 0
+                        if (fechaIni is None and opcSalir != '0'):
+                            aux = input('Introduce la fecha de inicio del alquiler(yyyy-mm-dd) o 0 para salir:\n')
+                            opcSalir = aux
+                            if (opcSalir != '0'):
+                                VerificationExceptions.formatoFecha(aux)
+                                fechaIni = aux
+                                intentos = 0
+                        if (fechaFin is None and opcSalir != '0'):
+                            aux = input('Introduce la fecha final del alquiler(yyyy-mm-dd) o 0 para salir:\n')
+                            opcSalir = aux
+                            if (opcSalir != '0'):
+                                VerificationExceptions.formatoFecha(aux)
+                                VerificationExceptions.dife_fechas(fechaIni, aux)
+                                fechaFin = aux
+                                intentos = 0
+                        if (kmIni is None and opcSalir != '0'):
+                            aux = input('Introduce los kilometros iniciales o 0 para salir:\n')
+                            opcSalir = aux
+                            if (opcSalir != '0'):
+                                VerificationExceptions.esNum(aux)
+                                kmIni = aux
+                                intentos = 0
+                                salir = True
+                        if (opcSalir == '0'):
                             salir = True
-                    if (opcSalir == '0'):
+                    except VerificationExceptions.MisExceptions as err:
+                        intentos += 1
+                        print(err)
+            elif (idCoche == -1):
+                intentos = 3
+            else:
+                opcSalir = '0'
+            if (intentos < 3 and opcSalir != '0'):
+                salir = False
+                GestionXML.crearAlquiler(dni, fechaIni, fechaFin, kmIni, idCoche)
+                print("Guardado correctamente")
+                op = None
+                while not salir and op != "s":
+                    op = input("Desas introducir mas alquileres?[S/N]").lower()
+                    if op == "s":
+                        print()
+                    elif op == "n":
+                        print("Saliendo...")
                         salir = True
-                except VerificationExceptions.MisExceptions as err:
-                    intentos += 1
-                    print(err)
-        elif (idCoche == -1):
-            intentos = 3
+                    else:
+                        print("Entrada no valida.")
+            elif (opcSalir == '0'):
+                print("Saliendo...")
+                salir = True
+            else:
+                print("Se han superado el maximo de errores.")
+                salir = True
         else:
-            opcSalir = '0'
-        if (intentos < 3 and opcSalir != '0'):
-            GestionXML.crearAlquiler(dni, fechaIni, fechaFin, kmIni, idCoche)
-            print("Guardado correctamente")
-            while not salir:
-                op = input("Desas introducir mas alquileres?[S/N]").lower()
-                if op == "s":
-                    print()
-                elif op == "n":
-                    print("Saliendo...")
-                    salir = True
-                else:
-                    print("Entrada no valida.")
-        elif (opcSalir == '0'):
-            print("Saliendo...")
-            salir = True
-        else:
-            print("Se han superado el maximo de errores.")
-            salir = True
-
+            print("No hay coches disponibles")
 
 def cochesDisp():
     """
@@ -111,66 +115,71 @@ def finAlquiler():
     Funcion para finalizar un alquiler introduciendo los datos de finalizacion del alquiler
     :return:
     """
-    fechaDevo = None
-    kmFin = None
-    idAlq = None
-    opcSalir = None
-    intentos = 0
-    opcCorrect = False
+
     salir = False
     while not salir:
-        while (intentos < 3 and opcCorrect is False):
-            try:
-                idAlq = alquilerDni()
-                if (idAlq != -1 and idAlq != -2):
-                    if (fechaDevo is None and opcSalir != "0"):
-                        aux = input('Introduce la fecha de la devolucion del vehiculo(yyyy-mm-dd) o 0 para salir:\n')
-                        opcSalir = aux
-                        if (opcSalir != '0'):
-                            VerificationExceptions.formatoFecha(aux)
-                            fecha_ini = GestionXML.obt_elemento("alquileres.xml", idAlq, 'alquiler', 'fecha_inicio')
-                            VerificationExceptions.dife_fechas(fecha_ini, aux)
-                            fechaDevo = aux
-                            intentos = 0
-                    if (kmFin is None and opcSalir != "0"):
-                        aux = input('Introduce el kilometraje final o 0 para salir:\n')
-                        opcSalir = aux
-                        if (opcSalir != '0'):
-                            VerificationExceptions.esNum(aux)
-                            kmFin = aux
-                            intentos = 0
+        fechaDevo = None
+        kmFin = None
+        idAlq = None
+        opcSalir = None
+        intentos = 0
+        opcCorrect = False
+        if (Path('alquileres.xml').exists() and GestionXML.alquileres_activos() is True):
+            while (intentos < 3 and opcCorrect is False):
+                try:
+                    idAlq = alquilerDni()
+                    if (idAlq != -1 and idAlq != -2):
+                        if (fechaDevo is None and opcSalir != "0"):
+                            aux = input('Introduce la fecha de la devolucion del vehiculo(yyyy-mm-dd) o 0 para salir:\n')
+                            opcSalir = aux
+                            if (opcSalir != '0'):
+                                VerificationExceptions.formatoFecha(aux)
+                                fecha_ini = GestionXML.obt_elemento("alquileres.xml", idAlq, 'alquiler', 'fecha_inicio')
+                                VerificationExceptions.dife_fechas(fecha_ini, aux)
+                                fechaDevo = aux
+                                intentos = 0
+                        if (kmFin is None and opcSalir != "0"):
+                            aux = input('Introduce el kilometraje final o 0 para salir:\n')
+                            opcSalir = aux
+                            if (opcSalir != '0'):
+                                VerificationExceptions.esNum(aux)
+                                kmFin = aux
+                                intentos = 0
+                                opcCorrect = True
+                        if (opcSalir == "0"):
+                            print("Saliendo...")
                             opcCorrect = True
-                    if (opcSalir == "0"):
-                        print("Saliendo...")
+                            salir = True
+                    elif (idAlq == -1):
+                        intentos = 3
+                    else:
+                        opcSalir = "0"
                         opcCorrect = True
                         salir = True
-                elif (idAlq == -1):
-                    intentos = 3
-                else:
-                    opcSalir = "0"
-                    opcCorrect = True
-                    salir = True
 
-            except VerificationExceptions.MisExceptions as err:
-                intentos += 1
-                print(err)
-        if (intentos < 3 and opcSalir != "0"):
-            GestionXML.finAlquiler(fechaDevo, kmFin, idAlq)
-            print("Se ha finalizado correctamente el alquiler")
-            while not salir:
-                op = input("Desas finalizar mas alquileres?[S/N]").lower()
-                if op == "s":
-                    print()
-                elif op == "n":
-                    print("Saliendo...")
-                    salir = True
-                else:
-                    print("Entrada no valida.")
-            GestionXML.mostrar_por_atributo(idAlq)
-        elif (intentos == 3):
-            salir = True
-            print("No se puede cometer mas de 3 errores seguidos")
-
+                except VerificationExceptions.MisExceptions as err:
+                    intentos += 1
+                    print(err)
+            if (intentos < 3 and opcSalir != "0"):
+                salir = False
+                GestionXML.finAlquiler(fechaDevo, kmFin, idAlq)
+                print("Se ha finalizado correctamente el alquiler")
+                op = None
+                while not salir and op != "s":
+                    op = input("Desas finalizar mas alquileres?[S/N]").lower()
+                    if op == "s":
+                        print()
+                    elif op == "n":
+                        print("Saliendo...")
+                        salir = True
+                    else:
+                        print("Entrada no valida.")
+                GestionXML.mostrar_por_atributo(idAlq)
+            elif (intentos == 3):
+                salir = True
+                print("No se puede cometer mas de 3 errores seguidos")
+        else:
+            print("No hay alquileres activos")
 
 def alquilerDni():
     """
@@ -228,7 +237,7 @@ def modificar():
     """
     salir = False
     idAlq = alquilerDni()
-    if (idAlq != -1):
+    if (idAlq != -1 and idAlq != -2):
         while (salir is False):
             opc = input(''' 
             ******* MODIFICACION ALQUILER *******
@@ -385,8 +394,10 @@ def buscarMatricula():
             else:
                 salir = True
         if (fallos < 3 and matricula != '0'):
+            salir = False
             GestionXML.mostrar_por_elemento('id_vehiculo', id_veh)
-            while not salir:
+            op = None
+            while not salir and op != "s":
                 op = input("Desas buscar otro alquiler?[S/N]").lower()
                 if op == "s":
                     print()
@@ -424,8 +435,10 @@ def buscarDni():
             else:
                 salir = True
         if (fallos < 3 and dni != '0'):
+            salir = False
             GestionXML.mostrar_por_elemento('dni', dni)
-            while not salir:
+            op = None
+            while not salir and op != "s":
                 op = input("Desas buscar otro alquiler?[S/N]").lower()
                 if op == "s":
                     print()
