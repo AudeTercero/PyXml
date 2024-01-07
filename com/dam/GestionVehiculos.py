@@ -218,6 +218,7 @@ def modificar():
     xml_path = "vehiculos.xml"
     cont = 0
     salir = False
+    salir_sin_guardar = False
     matricula = ""
 
     # Comprobaciones pertinentes
@@ -228,6 +229,7 @@ def modificar():
             matricula = input("Ingrese la matricula del vehiculo o pulse 0 para salir: ")
             if matricula == "0":
                 salir = True
+                salir_sin_guardar = True
             else:
                 try:
                     if not GestionXML.existe_matricula(xml_path, matricula):
@@ -245,11 +247,9 @@ def modificar():
                     cont += 1
                     print(err)
 
-        if cont < 3:
-            salir = False
+        if cont < 3 and not salir_sin_guardar:
+            GestionXML.modificar_vehiculo(matricula, xml_path)
 
-            while not salir:
-                GestionXML.modificar_vehiculo(matricula, xml_path)
 
 
 def buscar():

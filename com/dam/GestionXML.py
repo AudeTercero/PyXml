@@ -215,7 +215,6 @@ def modificar_vehiculo(matricula, xml_path):
             if mat_vehi == matricula:
                 vehiculo_encontrado = True
 
-
         # Si no lo encuentra, lo indicamos
         if not vehiculo_encontrado:
             print("No se encontro el vehiculo")
@@ -224,7 +223,7 @@ def modificar_vehiculo(matricula, xml_path):
                 opc = input(
                     "\tSelecciona una opcion:\n 1. Modificar ID \n 2. Modificar Matricula\n 3. Modificar Marca\n 4. Modificar Modelo"
                     "\n 5. Modificar Anio de Fabricacion \n 6. Modificar Tarifa Diaria\n 7. Modificar estado "
-                    "\n 0. Guardar y salir \n")
+                    "\n 0. Salir \n")
 
                 # Hay que controlar que no se repitan id ni matricula
                 if opc == "1":
@@ -238,6 +237,8 @@ def modificar_vehiculo(matricula, xml_path):
                         else:
                             print("El ID introducido ya pertenece a un vehiculo existente.")
 
+                    salir = True
+
                 elif opc == "2":
                     mat_valida = False
 
@@ -246,40 +247,48 @@ def modificar_vehiculo(matricula, xml_path):
                         if existe_matricula(xml_path, nueva_mat) is not True:
                             mat_valida = True
                             modificar_etiqueta(xml_path, "vehiculo", "matricula", vehiculo.find("matricula").text,
-                                               mat_valida)
+                                               nueva_mat)
                         else:
                             print("La matricula introducida ya pertenece a un vehiculo existente.")
+                    salir = True
 
                 elif opc == "3":
                     nuevaMarca = input("Ingrese la nueva marca del vehículo: ")
                     modificar_etiqueta(xml_path, "vehiculo", "descripcion/marca",
                                        vehiculo.find("descripcion/marca").text, nuevaMarca)
+                    salir = True
 
                 elif opc == "4":
                     nuevoModelo = input("Ingrese el nuevo modelo del vehículo: ")
                     modificar_etiqueta(xml_path, "vehiculo", "descripcion/modelo",
                                        vehiculo.find("descripcion/modelo").text, nuevoModelo)
+                    salir = True
 
                 elif opc == "5":
                     nuevoAnio = int(input("Ingrese el nuevo año de fabricación del vehículo: "))
                     modificar_etiqueta(xml_path, "vehiculo", "anioFabricacion",
                                        vehiculo.find("anioFabricacion").text, nuevoAnio)
+                    salir = True
 
                 elif opc == "6":
                     nuevaTarifa = float(input("Ingrese la nueva tarifa por día del vehículo: "))
                     modificar_etiqueta(xml_path, "vehiculo", "tarifaDia", vehiculo.find("tarifaDia").text,
                                        nuevaTarifa)
+                    salir = True
 
                 elif opc == "7":
                     nuevoEstado = input(
                         "Ingrese el nuevo estado del vehículo (disponible, alquilado o mantenimiento): ")
                     modificar_etiqueta(xml_path, "vehiculo", "estado", vehiculo.find("estado").text, nuevoEstado)
 
-                elif opc == "0":
                     salir = True
 
+                elif opc == "0":
+                    salir = True
+                    print('Saliendo...')
+
                 else:
-                    print("Esa opcion no existe")
+                    print("Opcion no valida")
 
     except FileNotFoundError:
         print("No hay vehiculos guardados")
