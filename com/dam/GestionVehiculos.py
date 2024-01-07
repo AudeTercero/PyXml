@@ -160,7 +160,7 @@ def baja():
 
     # Comprobaciones pertinentes
     if not GestionXML.hay_vehiculos(xmlPath):
-        print("Saliendo...")
+        print("No hay vehiculos guardados, saliendo...")
     else:
         while not salir:
             if not cont == 3:
@@ -168,8 +168,13 @@ def baja():
                 if (matricula == "0"):
                     print("Saliendo...")
                     salir = True
+
+                elif matricula == "":
+                    print("No has introducido nada.")
+                    cont += 1
                 else:
                     try:
+
                         if not GestionXML.existe_matricula(xmlPath, matricula):
                             print("No existe ningun vehiculo con esa matricula.")
                             cont += 1
@@ -183,9 +188,10 @@ def baja():
                         cont += 1
                         print(err)
             else:
-                print("Saliendo...")
+                salir = True
+                print("Has llegado al limite de intentos, saliendo...")
 
-            if cont < 3 and matricula != "0":
+            if cont < 3 and matricula != "0" and matricula != "":
                 salir = False
 
                 if GestionXML.esta_disponible(xmlPath, matricula):

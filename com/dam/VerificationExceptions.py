@@ -68,9 +68,13 @@ def formatoFecha(fecha):
     :param fecha: recibe la fecha escrita por el usuario
     :return:
     """
-    formato = "%Y-%m-%d"
+    formato = "%Y"
     try:
-        datetime.strptime(fecha, formato)
+        fecha_dt = datetime.strptime(fecha, formato)
+
+        if not 1900 <= fecha_dt <= 2100:
+            raise MisExceptions('Anio fuera del rango valido (1900 - 2100)')
+
     except ValueError:
         raise MisExceptions('Formato de la fecha incorrecto. Formato esperado yyyy-mm-dd')
 
