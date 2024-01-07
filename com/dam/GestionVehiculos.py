@@ -92,7 +92,7 @@ def alta():
                 else:
                     try:
                         VerificationExceptions.hayAlgo(anioFabricacion)
-                        VerificationExceptions.formatoFecha(anioFabricacion)
+                        VerificationExceptions.formatoFechaVehiculo(anioFabricacion)
                         salir = True
 
                     except VerificationExceptions.MisExceptions as err:

@@ -68,6 +68,20 @@ def formatoFecha(fecha):
     :param fecha: recibe la fecha escrita por el usuario
     :return:
     """
+    formato = "%Y-%M-%D"
+    try:
+        datetime.strptime(fecha, formato)
+
+    except ValueError:
+        raise MisExceptions('Formato de la fecha incorrecto. Formato esperado yyyy')
+
+
+def formatoFechaVehiculo(fecha):
+    """
+    Funcion para comporbar que el formato de la fecha sea correcto en caso de que no lanza una excepcion
+    :param fecha: recibe la fecha escrita por el usuario
+    :return:
+    """
     formato = "%Y"
     try:
         datetime.strptime(fecha, formato)

@@ -295,7 +295,7 @@ def modificar_vehiculo(matricula, xml_path):
 
                         try:
                             VerificationExceptions.hayAlgo(nuevoAnio)
-                            VerificationExceptions.formatoFecha(nuevoAnio)
+                            VerificationExceptions.formatoFechaVehiculo(nuevoAnio)
                             modificar_etiqueta(xml_path, "vehiculo", "anioFabricacion",
                                                vehiculo.get("id"), nuevoAnio)
                             anio_valido = True
