@@ -15,4 +15,5 @@ while(salir):
         salir = False
     else:
         print("No hay esa opcion")
-print("Finalizamos Gestion de Alquileres")
+
+print("Finalizamos Gestion de Alquileres.")

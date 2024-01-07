@@ -174,7 +174,8 @@ def baja():
 
         # Comprobaciones pertinentes
         if not GestionXML.hay_vehiculos(xmlPath):
-            print("No hay vehiculos guardados, saliendo...")
+            print("Saliendo...")
+            continuar = False
         else:
             while not salir:
                 if not cont == 3:
@@ -189,14 +190,14 @@ def baja():
                         cont += 1
                     else:
                         try:
+                            VerificationExceptions.hayAlgo(matricula)
+                            VerificationExceptions.matFormat(matricula)
 
                             if not GestionXML.existe_matricula(xmlPath, matricula):
                                 print("No existe ningun vehiculo con esa matricula.")
                                 cont += 1
 
                             else:
-                                VerificationExceptions.hayAlgo(matricula)
-                                VerificationExceptions.matFormat(matricula)
                                 salir = True
 
                         except VerificationExceptions.MisExceptions as err:
@@ -207,32 +208,27 @@ def baja():
                     continuar = False
                     print("Has llegado al limite de intentos, saliendo...")
 
-                if cont < 3 and matricula != "0" and matricula != "":
-                    salir = False
-
-                    if GestionXML.esta_disponible(xmlPath, matricula):
-                        while not salir:
-                            op = input("Seguro que quieres borrar el vehiculo? [S/N]").lower()
-                            if (op == "s"):
-                                GestionXML.eliminar_vehiculo(matricula, xmlPath)
-
-                                baja = input(
-                                    "Pulsa 'S' para continuar dando de baja vehiculos o pulsa cualquier otra tecla para salir. ").lower()
-                                if baja != 's':
-                                    continuar = False
-                                    print("Saliendo...")
-
-                                salir = True
-                            elif (op == "n"):
-                                print("Saliendo...")
-                                salir = True
+            if cont < 3 and matricula != "0" and matricula != "":
+                salir = False
+                if GestionXML.esta_disponible(xmlPath, matricula):
+                    while not salir:
+                        op = input("Seguro que quieres borrar el vehiculo? [S/N]").lower()
+                        if (op == "s"):
+                            GestionXML.eliminar_vehiculo(matricula, xmlPath)
+                            baja = input(
+                                "Pulsa 'S' para continuar dando de baja vehiculos o pulsa cualquier otra tecla para salir. ").lower()
+                            if baja != 's':
                                 continuar = False
-                            else:
-                                print("Opcion no valida.")
-                    else:
-                        print("El vehiculo no esta disponible en estos momentos y no se puede borrar.")
-
-
+                                print("Saliendo...")
+                            salir = True
+                        elif (op == "n"):
+                            print("Saliendo...")
+                            salir = True
+                            continuar = False
+                        else:
+                            print("Opcion no valida.")
+                else:
+                    print("El vehiculo no esta disponible en estos momentos y no se puede borrar.")
 def modificar():
     """
     Metodo para modificar los atributos de los vehiculos guardados

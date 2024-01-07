@@ -216,6 +216,7 @@ def modificar_vehiculo(matricula, xml_path):
 
             if mat_vehi == matricula:
                 vehiculo_encontrado = True
+                id = vehiculo.get("id")
 
         # Si no lo encuentra, lo indicamos
         if not vehiculo_encontrado:
@@ -235,7 +236,7 @@ def modificar_vehiculo(matricula, xml_path):
                         nuevo_id = input("Ingresa el nuevo ID del vehiculo")
                         if existe_id(xml_path, nuevo_id, "vehiculo") is not True:
                             id_valido = True
-                            modificar_atributo(xml_path, "vehiculo", vehiculo.get("id"), nuevo_id)
+                            modificar_atributo(xml_path, "vehiculo", id, nuevo_id)
                         else:
                             print("El ID introducido ya pertenece a un vehiculo existente.")
 
@@ -248,7 +249,7 @@ def modificar_vehiculo(matricula, xml_path):
                         nueva_mat = input("Ingresa la nueva matricula del vehiculo")
                         if existe_matricula(xml_path, nueva_mat) is not True:
                             mat_valida = True
-                            modificar_etiqueta(xml_path, "vehiculo", "matricula", vehiculo.get("id"), nueva_mat)
+                            modificar_etiqueta(xml_path, "vehiculo", "matricula", id, nueva_mat)
                         else:
                             print("La matricula introducida ya pertenece a un vehiculo existente.")
                     salir = True
@@ -262,7 +263,7 @@ def modificar_vehiculo(matricula, xml_path):
                         try:
                             VerificationExceptions.hayAlgo(nuevaMarca)
                             modificar_etiqueta(xml_path, "vehiculo", "descripcion/marca",
-                                               vehiculo.get("id"), nuevaMarca)
+                                               id, nuevaMarca)
                             mar_valida = True
 
                         except VerificationExceptions.MisExceptions as err:
@@ -279,7 +280,7 @@ def modificar_vehiculo(matricula, xml_path):
                         try:
                             VerificationExceptions.hayAlgo(nuevoModelo)
                             modificar_etiqueta(xml_path, "vehiculo", "descripcion/modelo",
-                                               vehiculo.get("id"), nuevoModelo)
+                                               id, nuevoModelo)
                             mod_valido = True
 
                         except VerificationExceptions.MisExceptions as err:
@@ -297,7 +298,7 @@ def modificar_vehiculo(matricula, xml_path):
                             VerificationExceptions.hayAlgo(nuevoAnio)
                             VerificationExceptions.formatoFechaVehiculo(nuevoAnio)
                             modificar_etiqueta(xml_path, "vehiculo", "anioFabricacion",
-                                               vehiculo.get("id"), nuevoAnio)
+                                               id, nuevoAnio)
                             anio_valido = True
 
                         except VerificationExceptions.MisExceptions as err:
@@ -314,7 +315,7 @@ def modificar_vehiculo(matricula, xml_path):
                         try:
                             VerificationExceptions.hayAlgo(nuevaTarifa)
                             VerificationExceptions.esNum(nuevaTarifa)
-                            modificar_etiqueta(xml_path, "vehiculo", "tarifaDia", vehiculo.get("id"),
+                            modificar_etiqueta(xml_path, "vehiculo", "tarifaDia", id,
                                                nuevaTarifa)
                             tar_valida = True
 
@@ -331,7 +332,7 @@ def modificar_vehiculo(matricula, xml_path):
                         nuevoEstado = input("Ingrese el nuevo estado del vehículo (disponible, alquilado o mantenimiento): ")
                         try:
                             VerificationExceptions.disp_correcto(nuevoEstado)
-                            modificar_etiqueta(xml_path, "vehiculo", "estado", vehiculo.get("id"), nuevoEstado)
+                            modificar_etiqueta(xml_path, "vehiculo", "estado", id, nuevoEstado)
                             est_valido = True
 
                         except VerificationExceptions.MisExceptions as err:
