@@ -3,6 +3,8 @@ from xml.etree.ElementTree import Element, SubElement, Comment, ElementTree
 from pathlib import Path
 from datetime import datetime
 
+from com.dam import VerificationExceptions
+
 
 # ******************** FUNCIONES  VEHICULOS **************************************
 
@@ -246,40 +248,94 @@ def modificar_vehiculo(matricula, xml_path):
                         nueva_mat = input("Ingresa la nueva matricula del vehiculo")
                         if existe_matricula(xml_path, nueva_mat) is not True:
                             mat_valida = True
-                            modificar_etiqueta(xml_path, "vehiculo", "matricula", vehiculo.find("matricula").text,
-                                               nueva_mat)
+                            modificar_etiqueta(xml_path, "vehiculo", "matricula", vehiculo.get("id"), nueva_mat)
                         else:
                             print("La matricula introducida ya pertenece a un vehiculo existente.")
                     salir = True
 
                 elif opc == "3":
-                    nuevaMarca = input("Ingrese la nueva marca del vehículo: ")
-                    modificar_etiqueta(xml_path, "vehiculo", "descripcion/marca",
-                                       vehiculo.find("descripcion/marca").text, nuevaMarca)
+                    mar_valida = False
+
+                    while not mar_valida:
+                        nuevaMarca = input("Ingrese la nueva marca del vehiculo: ")
+
+                        try:
+                            VerificationExceptions.hayAlgo(nuevaMarca)
+                            modificar_etiqueta(xml_path, "vehiculo", "descripcion/marca",
+                                               vehiculo.get("id"), nuevaMarca)
+                            mar_valida = True
+
+                        except VerificationExceptions.MisExceptions as err:
+                            print(err)
+
                     salir = True
 
                 elif opc == "4":
-                    nuevoModelo = input("Ingrese el nuevo modelo del vehículo: ")
-                    modificar_etiqueta(xml_path, "vehiculo", "descripcion/modelo",
-                                       vehiculo.find("descripcion/modelo").text, nuevoModelo)
+                    mod_valido = False
+
+                    while not mod_valido:
+                        nuevoModelo = input("Ingrese el nuevo modelo del vehiculo: ")
+
+                        try:
+                            VerificationExceptions.hayAlgo(nuevoModelo)
+                            modificar_etiqueta(xml_path, "vehiculo", "descripcion/modelo",
+                                               vehiculo.get("id"), nuevoModelo)
+                            mod_valido = True
+
+                        except VerificationExceptions.MisExceptions as err:
+                            print(err)
+
                     salir = True
 
                 elif opc == "5":
-                    nuevoAnio = int(input("Ingrese el nuevo año de fabricación del vehículo: "))
-                    modificar_etiqueta(xml_path, "vehiculo", "anioFabricacion",
-                                       vehiculo.find("anioFabricacion").text, nuevoAnio)
+                    anio_valido = False
+
+                    while not anio_valido:
+                        nuevoAnio = int(input("Ingrese el nuevo anio de fabricacion del vehiculo: "))
+
+                        try:
+                            VerificationExceptions.hayAlgo(nuevoAnio)
+                            VerificationExceptions.formatoFecha(nuevoAnio)
+                            modificar_etiqueta(xml_path, "vehiculo", "anioFabricacion",
+                                               vehiculo.get("id"), nuevoAnio)
+                            anio_valido = True
+
+                        except VerificationExceptions.MisExceptions as err:
+                            print(err)
+
+
                     salir = True
 
                 elif opc == "6":
-                    nuevaTarifa = float(input("Ingrese la nueva tarifa por día del vehículo: "))
-                    modificar_etiqueta(xml_path, "vehiculo", "tarifaDia", vehiculo.find("tarifaDia").text,
-                                       nuevaTarifa)
+                    tar_valida = False
+
+                    while not tar_valida:
+                        nuevaTarifa = float(input("Ingrese la nueva tarifa por dia del vehiculo: "))
+                        try:
+                            VerificationExceptions.hayAlgo(nuevaTarifa)
+                            VerificationExceptions.esNum(nuevaTarifa)
+                            modificar_etiqueta(xml_path, "vehiculo", "tarifaDia", vehiculo.get("id"),
+                                               nuevaTarifa)
+                            tar_valida = True
+
+                        except VerificationExceptions.MisExceptions as err:
+                            print(err)
+
+
                     salir = True
 
                 elif opc == "7":
-                    nuevoEstado = input(
-                        "Ingrese el nuevo estado del vehículo (disponible, alquilado o mantenimiento): ")
-                    modificar_etiqueta(xml_path, "vehiculo", "estado", vehiculo.find("estado").text, nuevoEstado)
+                    est_valido = False
+
+                    while not est_valido:
+                        nuevoEstado = input("Ingrese el nuevo estado del vehículo (disponible, alquilado o mantenimiento): ")
+                        try:
+                            VerificationExceptions.disp_correcto(nuevoEstado)
+                            modificar_etiqueta(xml_path, "vehiculo", "estado", vehiculo.get("id"), nuevoEstado)
+                            est_valido = True
+
+                        except VerificationExceptions.MisExceptions as err:
+                            print(err)
 
                     salir = True
 

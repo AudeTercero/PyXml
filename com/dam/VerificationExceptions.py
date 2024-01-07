@@ -70,13 +70,10 @@ def formatoFecha(fecha):
     """
     formato = "%Y"
     try:
-        fecha_dt = datetime.strptime(fecha, formato)
-
-        if not 1900 <= fecha_dt <= 2100:
-            raise MisExceptions('Anio fuera del rango valido (1900 - 2100)')
+        datetime.strptime(fecha, formato)
 
     except ValueError:
-        raise MisExceptions('Formato de la fecha incorrecto. Formato esperado yyyy-mm-dd')
+        raise MisExceptions('Formato de la fecha incorrecto. Formato esperado yyyy')
 
 
 def disp_correcto(disp):
