@@ -25,13 +25,14 @@ def alta():
                     salir = True
                 else:
                     try:
+                        VerificationExceptions.hayAlgo(matricula)
+                        VerificationExceptions.matFormat(matricula)
+
                         if GestionXML.existe_matricula(xmlPath, matricula):
                             print("Ya existe un vehiculo con esa matricula.")
                             cont += 1
 
                         else:
-                            VerificationExceptions.hayAlgo(matricula)
-                            VerificationExceptions.matFormat(matricula)
                             salir = True
 
                     except VerificationExceptions.MisExceptions as err:
@@ -112,7 +113,6 @@ def alta():
                     salir = True
                 else:
                     try:
-                        VerificationExceptions.hayAlgo(tarifaDia)
                         VerificationExceptions.esNum(tarifaDia)
                         salir = True
 

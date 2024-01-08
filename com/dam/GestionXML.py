@@ -234,11 +234,19 @@ def modificar_vehiculo(matricula, xml_path):
 
                     while not id_valido:
                         nuevo_id = input("Ingresa el nuevo ID del vehiculo")
-                        if existe_id(xml_path, nuevo_id, "vehiculo") is not True:
-                            id_valido = True
-                            modificar_atributo(xml_path, "vehiculo", id, nuevo_id)
-                        else:
-                            print("El ID introducido ya pertenece a un vehiculo existente.")
+
+                        try:
+                            VerificationExceptions.esNum(nuevo_id)
+
+                            if existe_id(xml_path, nuevo_id, "vehiculo") is not True:
+                                id_valido = True
+                                modificar_atributo(xml_path, "vehiculo", id, nuevo_id)
+                            else:
+                                print("El ID introducido ya pertenece a un vehiculo existente.")
+
+
+                        except VerificationExceptions.MisExceptions as err:
+                            print(err)
 
                     salir = True
 
@@ -247,11 +255,20 @@ def modificar_vehiculo(matricula, xml_path):
 
                     while not mat_valida:
                         nueva_mat = input("Ingresa la nueva matricula del vehiculo")
-                        if existe_matricula(xml_path, nueva_mat) is not True:
-                            mat_valida = True
-                            modificar_etiqueta(xml_path, "vehiculo", "matricula", id, nueva_mat)
-                        else:
-                            print("La matricula introducida ya pertenece a un vehiculo existente.")
+
+                        try:
+                            VerificationExceptions.hayAlgo(nueva_mat)
+                            VerificationExceptions.matFormat(nueva_mat)
+
+                            if existe_matricula(xml_path, nueva_mat) is not True:
+                                mat_valida = True
+                                modificar_etiqueta(xml_path, "vehiculo", "matricula", id, nueva_mat)
+                            else:
+                                print("La matricula introducida ya pertenece a un vehiculo existente.")
+
+                        except VerificationExceptions.MisExceptions as err:
+                            print(err)
+
                     salir = True
 
                 elif opc == "3":
@@ -304,7 +321,6 @@ def modificar_vehiculo(matricula, xml_path):
                         except VerificationExceptions.MisExceptions as err:
                             print(err)
 
-
                     salir = True
 
                 elif opc == "6":
@@ -322,14 +338,14 @@ def modificar_vehiculo(matricula, xml_path):
                         except VerificationExceptions.MisExceptions as err:
                             print(err)
 
-
                     salir = True
 
                 elif opc == "7":
                     est_valido = False
 
                     while not est_valido:
-                        nuevoEstado = input("Ingrese el nuevo estado del vehículo (disponible, alquilado o mantenimiento): ")
+                        nuevoEstado = input(
+                            "Ingrese el nuevo estado del vehículo (disponible, alquilado o mantenimiento): ")
                         try:
                             VerificationExceptions.disp_correcto(nuevoEstado)
                             modificar_etiqueta(xml_path, "vehiculo", "estado", id, nuevoEstado)

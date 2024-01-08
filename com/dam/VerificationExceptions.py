@@ -18,8 +18,8 @@ def hayAlgo(cadena):
         :param cadena: recibe una cadena por el usuario
         :return:
         """
-    if (len(cadena) > 4):
-        raise MisExceptions('No se ha escrito nada')
+    if (len(cadena) < 4):
+        raise MisExceptions('No se ha escrito nada o es muy corto.')
 
 
 def dniFormat(dni):
